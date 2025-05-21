@@ -1,0 +1,235 @@
+"use client";
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { ShoppingBag, User, Menu, X, Search } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useCart } from "@/contexts/CartContext";
+import { SearchBar } from "@/components/ui/search-bar";
+import CollectionsMenu from "./CollectionsMenu";
+
+const Navbar: React.FC = () => {
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const { isAuthenticated, isAdmin, user, logout } = useAuth();
+  const { totalItems } = useCart();
+  const pathname = usePathname();
+  const router = useRouter();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+    setIsSearchOpen(false);
+  }, [pathname]);
+
+  const handleSearch = (searchTerm: string) => {
+    if (searchTerm.trim()) {
+      router.push(`/products?search=${encodeURIComponent(searchTerm.trim())}`);
+      setIsSearchOpen(false);
+    }
+  };
+
+  return (
+    <nav
+      className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
+        isScrolled
+          ? "bg-white/90 backdrop-blur-md shadow-sm py-3"
+          : "bg-transparent py-5"
+      }`}
+    >
+      <div className="container mx-auto px-4 md:px-8">
+        <div className="flex items-center justify-between">
+          {/* Logo */}
+          <Link href="/" className="flex items-center">
+            <span className="text-2xl font-bold text-fashion-primary tracking-tight">
+              FashionFit
+            </span>
+          </Link>
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-8">
+            <Link href="/" className="nav-link">Home</Link>
+            <Link href="/products" className="nav-link">Shop</Link>
+            <CollectionsMenu />
+            <Link href="/about" className="nav-link">About</Link>
+            <Link href="/contact" className="nav-link">Contact</Link>
+          </div>
+
+          {/* Desktop Icons */}
+          <div className="hidden md:flex items-center space-x-6">
+            {isSearchOpen ? (
+              <SearchBar 
+                onSearch={handleSearch} 
+                placeholder="Search products..." 
+                className="w-64"
+              />
+            ) : (
+              <button 
+                onClick={() => setIsSearchOpen(true)} 
+                className="text-fashion-primary/80 hover:text-fashion-primary transition-colors"
+                aria-label="Open search"
+              >
+                <Search size={20} />
+              </button>
+            )}
+
+            {isAdmin && (
+              <Link href="/admin" className="text-fashion-primary/80 hover:text-fashion-primary transition-colors">
+                <span>Admin</span>
+              </Link>
+            )}
+
+            {isAuthenticated ? (
+              <div className="relative group">
+                <Link
+                  href="/profile"
+                  className="flex items-center space-x-1 text-fashion-primary/80 hover:text-fashion-primary transition-colors"
+                >
+                  <User size={20} />
+                  <span className="text-sm hidden lg:inline">{user?.name}</span>
+                </Link>
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
+                  <Link
+                    href="/profile"
+                    className="block px-4 py-2 text-sm text-fashion-primary hover:bg-fashion-light"
+                  >
+                    My Profile
+                  </Link>
+                  <Link
+                    href="/orders"
+                    className="block px-4 py-2 text-sm text-fashion-primary hover:bg-fashion-light"
+                  >
+                    My Orders
+                  </Link>
+                  <button
+                    onClick={logout}
+                    className="block w-full text-left px-4 py-2 text-sm text-fashion-primary hover:bg-fashion-light"
+                  >
+                    Logout
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <Link
+                href="/login"
+                className="flex items-center space-x-1 text-fashion-primary/80 hover:text-fashion-primary transition-colors"
+              >
+                <User size={20} />
+                <span className="text-sm hidden lg:inline">Login</span>
+              </Link>
+            )}
+
+            <Link
+              href="/cart"
+              className="relative text-fashion-primary/80 hover:text-fashion-primary transition-colors"
+            >
+              <ShoppingBag size={20} />
+              {totalItems > 0 && (
+                <span className="absolute -top-2 -right-2 bg-fashion-primary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {totalItems}
+                </span>
+              )}
+            </Link>
+          </div>
+
+          {/* Mobile Menu */}
+          <div className="flex items-center space-x-4 md:hidden">
+            <button
+              onClick={() => setIsSearchOpen(!isSearchOpen)}
+              className="text-fashion-primary/80 hover:text-fashion-primary transition-colors"
+              aria-label={isSearchOpen ? "Close search" : "Open search"}
+            >
+              <Search size={20} />
+            </button>
+            <Link
+              href="/cart"
+              className="relative text-fashion-primary/80 hover:text-fashion-primary transition-colors"
+            >
+              <ShoppingBag size={20} />
+              {totalItems > 0 && (
+                <span className="absolute -top-2 -right-2 bg-fashion-primary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {totalItems}
+                </span>
+              )}
+            </Link>
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="text-fashion-primary focus:outline-none"
+            >
+              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Search */}
+        {isSearchOpen && (
+          <div className="mt-4 md:hidden">
+            <SearchBar 
+              onSearch={handleSearch} 
+              placeholder="Search products..." 
+              className="w-full"
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Mobile Drawer */}
+      <div
+        className={`fixed inset-0 bg-white z-40 transform ${
+          isMobileMenuOpen ? "translate-x-0" : "translate-x-full"
+        } transition-transform duration-300 ease-in-out md:hidden pt-20 px-6`}
+      >
+        <div className="flex flex-col space-y-6">
+          <Link href="/" className="text-lg font-medium text-fashion-primary hover:text-fashion-primary/80">Home</Link>
+          <Link href="/products" className="text-lg font-medium text-fashion-primary hover:text-fashion-primary/80">Shop</Link>
+
+          <div className="space-y-2">
+            <p className="text-sm font-semibold text-fashion-primary/60 uppercase tracking-wider">Collections</p>
+            <Link href="/womenscollection" className="block text-lg font-medium text-fashion-primary hover:text-fashion-primary/80 pl-2">Women</Link>
+            <Link href="/mens-collection" className="block text-lg font-medium text-fashion-primary hover:text-fashion-primary/80 pl-2">Men</Link>
+            <Link href="/accessories-collection" className="block text-lg font-medium text-fashion-primary hover:text-fashion-primary/80 pl-2">Accessories</Link>
+            <Link href="/new-arrivals" className="block text-lg font-medium text-fashion-primary hover:text-fashion-primary/80 pl-2">New Arrivals</Link>
+          </div>
+
+          <Link href="/about" className="text-lg font-medium text-fashion-primary hover:text-fashion-primary/80">About</Link>
+          <Link href="/contact" className="text-lg font-medium text-fashion-primary hover:text-fashion-primary/80">Contact</Link>
+
+          <div className="border-t border-gray-200 my-4"></div>
+
+          {isAdmin && (
+            <Link href="/admin" className="text-lg font-medium text-fashion-primary hover:text-fashion-primary/80">Admin Dashboard</Link>
+          )}
+
+          {isAuthenticated ? (
+            <>
+              <Link href="/profile" className="text-lg font-medium text-fashion-primary hover:text-fashion-primary/80 flex items-center space-x-2">
+                <User size={20} /><span>My Profile</span>
+              </Link>
+              <Link href="/orders" className="text-lg font-medium text-fashion-primary hover:text-fashion-primary/80 flex items-center space-x-2">
+                <span>My Orders</span>
+              </Link>
+              <button onClick={logout} className="text-lg font-medium text-fashion-primary hover:text-fashion-primary/80 text-left">
+                Logout
+              </button>
+            </>
+          ) : (
+            <Link href="/login" className="text-lg font-medium text-fashion-primary hover:text-fashion-primary/80 flex items-center space-x-2">
+              <User size={20} /><span>Login / Sign Up</span>
+            </Link>
+          )}
+        </div>
+      </div>
+    </nav>
+  );
+};
+
+export default Navbar;

@@ -55,7 +55,7 @@ const Index = () => {
                     <h3 className="text-xl font-semibold text-white mb-2">{item.title}</h3>
                     <div className="transform translate-y-6 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
                       <Button variant="outline" className="bg-white/90 backdrop-blur-sm text-fashion-950 hover:bg-white border-0">
-                        Explore Collection
+                        Explore Collections
                       </Button>
                     </div>
                   </div>

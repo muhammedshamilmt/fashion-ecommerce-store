@@ -124,7 +124,12 @@ export async function GET(request: Request) {
     // Build query
     const query: any = {};
     if (category && category !== 'all') {
-      query.category = category;
+      // Handle specific categories
+      if (category === 'Mens Thobas' || category === 'Kids Thobas' || category === 'Turban & Caps' || category === 'Pajamas') {
+        query.category = category;
+      } else {
+        query.category = category;
+      }
     }
     if (featured === 'true') {
       query.featured = true;

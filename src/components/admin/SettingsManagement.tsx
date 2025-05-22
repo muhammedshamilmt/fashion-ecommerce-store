@@ -68,10 +68,12 @@ const SettingsManagement = () => {
 
       if (result.success) {
         setSettings(result.data);
+      } else {
+        throw new Error(result.error || "Failed to fetch settings");
       }
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to fetch settings");
       console.error("Error fetching settings:", error);
+      toast.error(error instanceof Error ? error.message : "Failed to fetch settings");
     } finally {
       setIsLoading(false);
     }
@@ -107,7 +109,6 @@ const SettingsManagement = () => {
   // Save settings
   const handleSaveSettings = async () => {
     try {
-      setIsSaving(true);
       const response = await fetch('/api/settings', {
         method: 'PUT',
         headers: {
@@ -119,23 +120,26 @@ const SettingsManagement = () => {
       const result = await response.json();
 
       if (!response.ok) {
-        // Handle validation errors from Zod
-        if (result.error && Array.isArray(result.error)) {
-          const errorMessage = result.error.map((err: any) => err.message).join(', ');
+        if (result.details) {
+          // Handle validation errors
+          const errorMessage = Array.isArray(result.details) 
+            ? result.details.map((err: any) => err.message).join(', ')
+            : result.error;
           throw new Error(errorMessage);
         }
-        // Handle other API errors
-        throw new Error(typeof result.error === 'string' ? result.error : "Failed to save settings");
-    }
+        throw new Error(result.error || "Failed to save settings");
+      }
 
       if (result.success) {
         toast.success("Settings saved successfully");
+        // Update local state with the validated data
+        setSettings(result.data);
+      } else {
+        throw new Error(result.error || "Failed to save settings");
       }
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to save settings");
       console.error("Error saving settings:", error);
-    } finally {
-      setIsSaving(false);
+      toast.error(error instanceof Error ? error.message : "Failed to save settings");
     }
   };
 
@@ -200,10 +204,10 @@ const SettingsManagement = () => {
                       <SelectValue placeholder="Select currency" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="usd">USD ($)</SelectItem>
-                      <SelectItem value="eur">EUR (€)</SelectItem>
+                      <SelectItem value="inr">INR (₹)</SelectItem>
+                      {/* <SelectItem value="eur">EUR (€)</SelectItem>
                       <SelectItem value="gbp">GBP (£)</SelectItem>
-                      <SelectItem value="jpy">JPY (¥)</SelectItem>
+                      <SelectItem value="jpy">JPY (¥)</SelectItem> */}
                     </SelectContent>
                   </Select>
                 </div>

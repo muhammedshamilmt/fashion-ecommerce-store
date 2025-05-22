@@ -54,22 +54,19 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ subtotal }) => {
           country: data.country,
         },
         items: items.map(item => ({
-          product: {
-            id: item.product._id,
-            name: item.product.name,
-            price: item.product.price,
-            images: item.product.images,
-          },
+          productId: item.product._id,
+          name: item.product.name,
+          price: item.product.price,
           quantity: item.quantity,
           size: item.size,
           color: item.color,
+          image: item.product.images[0],
         })),
         subtotal,
         shipping,
         tax,
         total,
         paymentMethod,
-        status: "pending"
       };
 
       const response = await fetch('/api/orders', {
@@ -83,12 +80,17 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ subtotal }) => {
       const result = await response.json();
 
       if (!response.ok) {
+        const errorMessage = result.error || result.details || "Failed to create order";
+        throw new Error(errorMessage);
+      }
+
+      if (!result.success) {
         throw new Error(result.error || "Failed to create order");
       }
 
       toast.success("Order placed successfully!");
-    clearCart();
-      router.push(`/order-confirmation?id=${result.data.orderId}`);
+      clearCart();
+      router.push(`/order-confirmation?id=${result.data._id}`);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to place order");
       console.error("Error placing order:", error);

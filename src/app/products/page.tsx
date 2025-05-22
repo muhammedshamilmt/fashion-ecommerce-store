@@ -1,10 +1,10 @@
-
+'use client'
 import React, { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams } from "next/navigation";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import ProductCard from "@/components/products/ProductCard";
-import { Product, products } from "@/utils/data";
+import { Product } from "@/utils/data";
 import { Filter, Sliders, ChevronDown, ChevronUp, X } from "lucide-react";
 import {
   Drawer,
@@ -15,11 +15,12 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { toast } from "sonner";
 
 const Products = () => {
-  const [searchParams] = useSearchParams();
-  const categoryParam = searchParams.get("category");
-  const featuredParam = searchParams.get("featured");
+  const searchParams = useSearchParams();
+  const categoryParam = searchParams?.get("category") || null;
+  const featuredParam = searchParams?.get("featured") || null;
   
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -35,83 +36,46 @@ const Products = () => {
   const [onlyInStock, setOnlyInStock] = useState(true);
   const [onlyFeatured, setOnlyFeatured] = useState(featuredParam === "true");
   
-  // Get unique categories, sizes, and colors
-  const categories = ["all", ...Array.from(new Set(products.map(p => p.category)))];
-  const allSizes = Array.from(new Set(products.flatMap(p => p.sizes))).sort();
-  const allColors = Array.from(new Set(products.flatMap(p => p.colors)));
+  // Get unique categories, sizes, and colors from filtered products
+  const categories = ["all", ...Array.from(new Set(filteredProducts.map(p => p.category)))];
+  const allSizes = Array.from(new Set(filteredProducts.flatMap(p => p.sizes))).sort();
+  const allColors = Array.from(new Set(filteredProducts.flatMap(p => p.colors)));
   
   useEffect(() => {
-    // Simulate API fetch with delay
     const fetchProducts = async () => {
       setIsLoading(true);
       try {
-        await new Promise(resolve => setTimeout(resolve, 800));
-        
-        let result = [...products];
-        
-        // Apply filters
+        const params = new URLSearchParams();
         if (selectedCategory !== "all") {
-          result = result.filter(p => p.category === selectedCategory);
+          params.append("category", selectedCategory);
         }
-        
-        if (selectedSizes.length > 0) {
-          result = result.filter(p => p.sizes.some(s => selectedSizes.includes(s)));
-        }
-        
-        if (selectedColors.length > 0) {
-          result = result.filter(p => p.colors.some(c => selectedColors.includes(c)));
-        }
-        
-        result = result.filter(p => p.price >= priceRange[0] && p.price <= priceRange[1]);
-        
-        if (onlyInStock) {
-          result = result.filter(p => p.inStock);
-        }
-        
         if (onlyFeatured) {
-          result = result.filter(p => p.featured);
+          params.append("featured", "true");
+        }
+
+        const response = await fetch(`/api/products?${params.toString()}`);
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.error || 'Failed to fetch products');
+        }
+
+        if (!result.success) {
+          throw new Error(result.error || 'Failed to fetch products');
         }
         
-        // Apply sorting
-        switch (sortBy) {
-          case "price-low":
-            result.sort((a, b) => a.price - b.price);
-            break;
-          case "price-high":
-            result.sort((a, b) => b.price - a.price);
-            break;
-          case "newest":
-            // In a real app, we'd sort by date
-            break;
-          case "featured":
-          default:
-            // Featured products first, then the rest
-            result.sort((a, b) => {
-              if (a.featured && !b.featured) return -1;
-              if (!a.featured && b.featured) return 1;
-              return 0;
-            });
-            break;
-        }
-        
-        setFilteredProducts(result);
+        setFilteredProducts(result.data);
       } catch (error) {
         console.error("Error fetching products:", error);
+        toast.error(error instanceof Error ? error.message : 'Failed to fetch products');
+        setFilteredProducts([]);
       } finally {
         setIsLoading(false);
       }
     };
     
     fetchProducts();
-  }, [
-    selectedCategory, 
-    selectedSizes, 
-    selectedColors, 
-    priceRange, 
-    sortBy, 
-    onlyInStock, 
-    onlyFeatured
-  ]);
+  }, [selectedCategory, onlyFeatured]);
   
   const toggleSize = (size: string) => {
     setSelectedSizes(prev => 
@@ -453,7 +417,7 @@ const Products = () => {
               ) : filteredProducts.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                   {filteredProducts.map((product, index) => (
-                    <ProductCard key={product.id} product={product} index={index} />
+                    <ProductCard key={product._id} product={product} index={index} />
                   ))}
                 </div>
               ) : (

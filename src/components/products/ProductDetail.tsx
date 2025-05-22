@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { 
   ShoppingBag, 
   Heart, 
@@ -24,25 +24,62 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useRouter } from "next/navigation";
 
 interface ProductDetailProps {
-  product: Product;
+  productId: string;
 }
 
-const ProductDetail: React.FC<ProductDetailProps> = ({ product }) => {
+const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
+  const [product, setProduct] = useState<Product | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [selectedSize, setSelectedSize] = useState(product.sizes[0]);
-  const [selectedColor, setSelectedColor] = useState(product.colors[0]);
+  const [selectedSize, setSelectedSize] = useState("");
+  const [selectedColor, setSelectedColor] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [activeTab, setActiveTab] = useState("details");
   const { addItem } = useCart();
   const router = useRouter();
 
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const response = await fetch(`/api/products/${productId}`);
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.error || 'Failed to fetch product');
+        }
+
+        if (!result.success) {
+          throw new Error(result.error || 'Failed to fetch product');
+        }
+
+        setProduct(result.data);
+        // Set initial size and color after product is loaded
+        if (result.data.sizes?.length > 0) {
+          setSelectedSize(result.data.sizes[0]);
+        }
+        if (result.data.colors?.length > 0) {
+          setSelectedColor(result.data.colors[0]);
+        }
+      } catch (error) {
+        console.error("Error fetching product:", error);
+        toast.error(error instanceof Error ? error.message : 'Failed to fetch product');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [productId]);
+
   const handleAddToCart = () => {
+    if (!product) return;
     addItem(product, quantity, selectedSize, selectedColor);
     toast.success(`${product.name} added to cart`);
   };
 
   const handleBuyNow = () => {
+    if (!product) return;
     addItem(product, quantity, selectedSize, selectedColor);
     router.push("/checkout");
   };
@@ -65,12 +102,14 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product }) => {
   };
 
   const handlePrevImage = () => {
+    if (!product) return;
     setCurrentImageIndex((prev) => 
       prev === 0 ? product.images.length - 1 : prev - 1
     );
   };
 
   const handleNextImage = () => {
+    if (!product) return;
     setCurrentImageIndex((prev) => 
       (prev + 1) % product.images.length
     );
@@ -79,6 +118,39 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product }) => {
   const handleWriteReview = () => {
     toast.success("Review form opened");
   };
+
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 animate-pulse">
+        <div className="space-y-6">
+          <div className="bg-gray-200 rounded-xl h-[500px]"></div>
+          <div className="flex space-x-4">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="w-20 h-20 bg-gray-200 rounded-md"></div>
+            ))}
+          </div>
+        </div>
+        <div className="space-y-8">
+          <div className="h-8 bg-gray-200 rounded w-1/4"></div>
+          <div className="h-12 bg-gray-200 rounded w-3/4"></div>
+          <div className="h-6 bg-gray-200 rounded w-1/2"></div>
+          <div className="h-32 bg-gray-200 rounded"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!product) {
+    return (
+      <div className="text-center py-12">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">Product Not Found</h2>
+        <p className="text-gray-600 mb-6">The product you're looking for doesn't exist or has been removed.</p>
+        <Button onClick={() => router.push('/products')}>
+          Back to Products
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 animate-fade-in">

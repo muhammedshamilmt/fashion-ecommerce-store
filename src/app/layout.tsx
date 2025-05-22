@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Providers } from "@/components/providers";
 import ClientLayout from './client-layout';
 import { ImageKitProvider } from "@/components/providers/ImageKitProvider";
+import { Suspense } from 'react';
 
 export const metadata: Metadata = {
   title: 'fashion store', // Your website title
@@ -16,11 +17,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning>
-        <ImageKitProvider>
-          <Providers>
-            <ClientLayout>{children}</ClientLayout>
-          </Providers>
-        </ImageKitProvider>
+        <Suspense fallback={<div>Loading...</div>}>
+          <ImageKitProvider>
+            <Providers>
+              <ClientLayout>{children}</ClientLayout>
+            </Providers>
+          </ImageKitProvider>
+        </Suspense>
       </body>
     </html>
   );

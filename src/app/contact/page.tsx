@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useRef } from "react";
-import { Mail, MapPin, Phone, Send, MessageCircle, Upload, X } from "lucide-react";
+import { Mail, MapPin, Phone, Send, MessageCircle, Upload, X, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -10,22 +10,45 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+interface ContactFormData {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  priority: "low" | "medium" | "high";
+  image: File | null;
+}
 
 const Contact = () => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<ContactFormData>({
     name: "",
     email: "",
     subject: "",
     message: "",
-    image: null as File | null
+    priority: "medium",
+    image: null
   });
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handlePriorityChange = (value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      priority: value as "low" | "medium" | "high"
+    }));
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -62,13 +85,15 @@ const Contact = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     try {
       const formDataToSend = new FormData();
       formDataToSend.append('name', formData.name);
       formDataToSend.append('email', formData.email);
       formDataToSend.append('subject', formData.subject);
       formDataToSend.append('message', formData.message);
+      formDataToSend.append('priority', formData.priority);
+      
       if (formData.image) {
         formDataToSend.append('image', formData.image);
       }
@@ -78,27 +103,40 @@ const Contact = () => {
         body: formDataToSend,
       });
 
-      const data = await response.json();
+      const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || 'Failed to send message');
+        if (result.details) {
+          // Handle validation errors
+          const errorMessage = Array.isArray(result.details) 
+            ? result.details.map((err: any) => err.message).join(', ')
+            : result.error;
+          throw new Error(errorMessage);
+        }
+        throw new Error(result.error || "Failed to send message");
       }
 
-      toast.success("Message sent successfully! We'll get back to you soon.");
-      setFormData({
-        name: "",
-        email: "",
-        subject: "",
-        message: "",
-        image: null
-      });
-      setPreviewUrl(null);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
+      if (result.success) {
+        toast.success("Message sent successfully! We'll get back to you soon.");
+        // Reset form
+        setFormData({
+          name: "",
+          email: "",
+          subject: "",
+          message: "",
+          priority: "medium",
+          image: null
+        });
+        setPreviewUrl(null);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+      } else {
+        throw new Error(result.error || "Failed to send message");
       }
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Failed to send message');
-      console.error('Error sending message:', error);
+      console.error("Error sending message:", error);
+      toast.error(error instanceof Error ? error.message : "Failed to send message");
     } finally {
       setIsSubmitting(false);
     }
@@ -247,6 +285,23 @@ const Contact = () => {
                     </div>
                     
                     <div>
+                      <Label htmlFor="priority" className="text-gray-700">Priority</Label>
+                      <Select
+                        value={formData.priority}
+                        onValueChange={handlePriorityChange}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select priority" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="low">Low</SelectItem>
+                          <SelectItem value="medium">Medium</SelectItem>
+                          <SelectItem value="high">High</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div>
                       <Label htmlFor="message" className="text-gray-700">Your Message</Label>
                       <Textarea
                         id="message"
@@ -308,12 +363,9 @@ const Contact = () => {
                       className="w-full py-3 bg-primary text-white flex items-center justify-center"
                     >
                       {isSubmitting ? (
-                        <span>Sending...</span>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                       ) : (
-                        <>
-                          <Send className="mr-2 h-5 w-5" />
-                          <span>Send Message</span>
-                        </>
+                        <span>Send Message</span>
                       )}
                     </Button>
                   </form>

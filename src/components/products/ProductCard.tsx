@@ -43,7 +43,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index }) => {
 
   return (
     <Link
-      href={`/products/${product.id}`}
+      href={`/products/${product._id}`}
       className="group relative bg-white rounded-xl shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md animate-fade-in-up"
       style={{ animationDelay }}
       onMouseEnter={() => setIsHovered(true)}
@@ -106,11 +106,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index }) => {
           {product.name}
         </h3>
         <div className="flex justify-between items-center">
-          <span className="font-bold text-fashion-primary">${product.price.toFixed(2)}</span>
+          <span className="font-bold text-fashion-primary">₹{product.price.toFixed(2)}</span>
           <div className="flex space-x-1">
             {product.colors.slice(0, 3).map((color, i) => (
               <div
-                key={i}
+                key={`${color}-${i}`}
                 className="w-3 h-3 rounded-full border border-gray-200"
                 style={{ backgroundColor: color.toLowerCase() }}
                 title={color}

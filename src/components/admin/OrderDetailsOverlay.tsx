@@ -20,15 +20,13 @@ interface OrderDetailsOverlayProps {
       country: string;
     };
     items: Array<{
-      product: {
-        id: string;
-        name: string;
-        price: number;
-        images: string[];
-      };
+      productId: string;
+      name: string;
+      price: number;
       quantity: number;
       size: string;
       color: string;
+      image: string;
     }>;
     subtotal: number;
     shipping: number;
@@ -133,21 +131,21 @@ const OrderDetailsOverlay: React.FC<OrderDetailsOverlayProps> = ({ order, onClos
                   <div key={index} className="flex items-center space-x-4 bg-white p-3 rounded-lg">
                     <div className="relative w-16 h-16">
                       <Image
-                        src={item.product.images[0]}
-                        alt={item.product.name}
+                        src={item.image}
+                        alt={item.name}
                         fill
                         className="object-cover rounded-md"
                       />
                     </div>
                     <div className="flex-1">
-                      <h5 className="font-medium text-fashion-primary">{item.product.name}</h5>
+                      <h5 className="font-medium text-fashion-primary">{item.name}</h5>
                       <p className="text-sm text-gray-600">
                         Quantity: {item.quantity} • Size: {item.size} • Color: {item.color}
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="font-medium text-fashion-primary">₹{item.product.price.toFixed(2)}</p>
-                      <p className="text-sm text-gray-600">Total: ₹{(item.product.price * item.quantity).toFixed(2)}</p>
+                      <p className="font-medium text-fashion-primary">₹{item.price.toFixed(2)}</p>
+                      <p className="text-sm text-gray-600">Total: ₹{(item.price * item.quantity).toFixed(2)}</p>
                     </div>
                   </div>
                 ))}

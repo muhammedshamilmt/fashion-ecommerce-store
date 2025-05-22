@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { connectToDatabase } from "@/lib/db";
+import { connectToDatabase } from "@/lib/mongodb";
 import { z } from "zod";
 import { ObjectId } from "mongodb";
 
@@ -117,9 +117,7 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const category = searchParams.get('category');
-    const search = searchParams.get('search');
-    const sortField = searchParams.get('sortField') || 'createdAt';
-    const sortDirection = searchParams.get('sortDirection') || 'desc';
+    const featured = searchParams.get('featured');
 
     const { db } = await connectToDatabase();
     
@@ -128,17 +126,13 @@ export async function GET(request: Request) {
     if (category && category !== 'all') {
       query.category = category;
     }
-    if (search) {
-      query.name = { $regex: search, $options: 'i' };
+    if (featured === 'true') {
+      query.featured = true;
     }
-
-    // Build sort
-    const sort: any = {};
-    sort[sortField] = sortDirection === 'asc' ? 1 : -1;
 
     const products = await db.collection("products")
       .find(query)
-      .sort(sort)
+      .sort({ createdAt: -1 })
       .toArray();
 
     return NextResponse.json({
@@ -146,15 +140,13 @@ export async function GET(request: Request) {
       data: products
     });
   } catch (error) {
-    console.error("Error fetching products:", error);
-    if (error instanceof Error) {
-      return NextResponse.json(
-        { success: false, error: error.message },
-        { status: 500 }
-      );
-    }
+    console.error('Error fetching products:', error);
     return NextResponse.json(
-      { success: false, error: "Failed to fetch products" },
+      { 
+        success: false, 
+        error: 'Failed to fetch products',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
       { status: 500 }
     );
   }

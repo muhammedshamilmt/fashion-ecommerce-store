@@ -194,8 +194,8 @@ const Navbar: React.FC = () => {
 
           <div className="space-y-2">
             <p className="text-sm font-semibold text-fashion-primary/60 uppercase tracking-wider">Collections</p>
-            <Link href="/womenscollection" className="block text-lg font-medium text-fashion-primary hover:text-fashion-primary/80 pl-2">Women</Link>
-            <Link href="/mens-collection" className="block text-lg font-medium text-fashion-primary hover:text-fashion-primary/80 pl-2">Men</Link>
+            <Link href="/womenscollection" className="block text-lg font-medium text-fashion-primary hover:text-fashion-primary/80 pl-2">Mens Thobas</Link>
+            <Link href="/mens-collection" className="block text-lg font-medium text-fashion-primary hover:text-fashion-primary/80 pl-2">Kids Thobas</Link>
             <Link href="/accessories-collection" className="block text-lg font-medium text-fashion-primary hover:text-fashion-primary/80 pl-2">Accessories</Link>
             <Link href="/new-arrivals" className="block text-lg font-medium text-fashion-primary hover:text-fashion-primary/80 pl-2">New Arrivals</Link>
           </div>

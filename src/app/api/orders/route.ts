@@ -1,17 +1,16 @@
 import { NextResponse } from "next/server";
-import { connectToDatabase } from "@/lib/db";
+import { connectToDatabase } from "@/lib/mongodb";
 import { z } from "zod";
+import { ObjectId } from "mongodb";
 
 const orderItemSchema = z.object({
-  product: z.object({
-    id: z.string(),
-    name: z.string(),
-    price: z.number(),
-    images: z.array(z.string()),
-  }),
+  productId: z.string(),
+  name: z.string(),
+  price: z.number(),
   quantity: z.number(),
   size: z.string(),
   color: z.string(),
+  image: z.string(),
 });
 
 const orderSchema = z.object({
@@ -32,8 +31,47 @@ const orderSchema = z.object({
   tax: z.number(),
   total: z.number(),
   paymentMethod: z.string(),
-  status: z.string().default("pending"),
+  status: z.enum(["pending", "processing", "shipped", "delivered"]).default("pending"),
 });
+
+export async function GET(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const email = searchParams.get('email');
+    const status = searchParams.get('status');
+
+    const { db } = await connectToDatabase();
+    
+    // Build query
+    const query: any = {};
+    if (email) {
+      query["customerInfo.email"] = email;
+    }
+    if (status) {
+      query.status = status;
+    }
+
+    const orders = await db.collection("orders")
+      .find(query)
+      .sort({ createdAt: -1 })
+      .toArray();
+
+    return NextResponse.json({
+      success: true,
+      data: orders
+    });
+  } catch (error) {
+    console.error("Error fetching orders:", error);
+    return NextResponse.json(
+      { 
+        success: false, 
+        error: 'Failed to fetch orders',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
+      { status: 500 }
+    );
+  }
+}
 
 export async function POST(request: Request) {
   try {
@@ -43,18 +81,23 @@ export async function POST(request: Request) {
     const { db } = await connectToDatabase();
     
     // Create new order
-    const result = await db.collection("orders").insertOne({
+    const order = {
       ...validatedData,
       createdAt: new Date(),
       updatedAt: new Date(),
+    };
+
+    const result = await db.collection("orders").insertOne(order);
+
+    // Fetch the created order
+    const createdOrder = await db.collection("orders").findOne({
+      _id: result.insertedId
     });
 
     return NextResponse.json({
       success: true,
       message: "Order created successfully",
-      data: {
-        orderId: result.insertedId,
-      }
+      data: createdOrder
     });
   } catch (error) {
     console.error("Error creating order:", error);
@@ -72,41 +115,6 @@ export async function POST(request: Request) {
     }
     return NextResponse.json(
       { success: false, error: "Failed to create order" },
-      { status: 500 }
-    );
-  }
-}
-
-export async function GET(request: Request) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const email = searchParams.get('email');
-
-    const { db } = await connectToDatabase();
-    
-    // Build query
-    const query = email ? { "customerInfo.email": email } : {};
-    
-    // Get orders
-    const orders = await db.collection("orders")
-      .find(query)
-      .sort({ createdAt: -1 })
-      .toArray();
-
-    return NextResponse.json({
-      success: true,
-      data: orders
-    });
-  } catch (error) {
-    console.error("Error fetching orders:", error);
-    if (error instanceof Error) {
-      return NextResponse.json(
-        { success: false, error: error.message },
-        { status: 500 }
-      );
-    }
-    return NextResponse.json(
-      { success: false, error: "Failed to fetch orders" },
       { status: 500 }
     );
   }

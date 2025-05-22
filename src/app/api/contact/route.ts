@@ -1,15 +1,13 @@
 import { NextResponse } from 'next/server';
-import clientPromise from '@/lib/db';
+import { connectToDatabase } from '@/lib/mongodb';
 import { z } from 'zod';
-import { writeFile } from 'fs/promises';
-import { join } from 'path';
 
 const contactSchema = z.object({
   name: z.string().min(1, "Name is required"),
   email: z.string().email("Invalid email address"),
   subject: z.string().min(1, "Subject is required"),
   message: z.string().min(1, "Message is required"),
-  image: z.any().optional(),
+  priority: z.enum(["low", "medium", "high"]).default("medium"),
 });
 
 export async function POST(request: Request) {
@@ -21,66 +19,74 @@ export async function POST(request: Request) {
     const email = formData.get('email') as string;
     const subject = formData.get('subject') as string;
     const message = formData.get('message') as string;
+    const priority = formData.get('priority') as "low" | "medium" | "high";
     const image = formData.get('image') as File | null;
 
-    // Validate the form data
+    // Validate the contact form data
     const validatedData = contactSchema.parse({
       name,
       email,
       subject,
       message,
-      image
+      priority
     });
 
-    let imageUrl = null;
+    const { db } = await connectToDatabase();
     
-    // Handle image upload if present
-    if (image) {
-      const bytes = await image.arrayBuffer();
-      const buffer = Buffer.from(bytes);
-      
-      // Create unique filename
-      const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1E9)}`;
-      const filename = `${uniqueSuffix}-${image.name}`;
-      
-      // Save to public/uploads directory
-      const uploadDir = join(process.cwd(), 'public', 'uploads');
-      const filepath = join(uploadDir, filename);
-      
-      await writeFile(filepath, buffer);
-      imageUrl = `/uploads/${filename}`;
-    }
-    
-    // Connect to MongoDB
-    const client = await clientPromise;
-    const db = client.db();
-    
-    // Insert the message into the messages collection
-    const result = await db.collection('messages').insertOne({
+    // Create message document
+    const messageDoc = {
       ...validatedData,
-      imageUrl,
-      createdAt: new Date(),
-      status: 'unread'
+      date: new Date(),
+      read: false,
+      status: "new",
+      hasAttachment: !!image
+    };
+
+    // Insert message into database
+    const result = await db.collection("messages").insertOne(messageDoc);
+
+    if (!result.insertedId) {
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: "Failed to save message" 
+        },
+        { status: 500 }
+      );
+    }
+
+    // If there's an image, handle it here
+    if (image) {
+      // TODO: Implement image upload to your preferred storage service
+      // For now, we'll just acknowledge that we received it
+      console.log('Received image:', image.name);
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: "Message sent successfully",
+      data: { ...messageDoc, _id: result.insertedId }
     });
-    
-    return NextResponse.json({ 
-      success: true, 
-      message: 'Message sent successfully',
-      id: result.insertedId 
-    });
-    
   } catch (error) {
-    console.error('Error saving message:', error);
+    console.error("Error sending message:", error);
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { success: false, message: 'Invalid form data', errors: error.errors },
+        { 
+          success: false, 
+          error: "Validation error",
+          details: error.errors 
+        },
         { status: 400 }
       );
     }
-    
+
     return NextResponse.json(
-      { success: false, message: 'Failed to send message' },
+      { 
+        success: false, 
+        error: "Failed to send message",
+        details: error instanceof Error ? error.message : "Unknown error"
+      },
       { status: 500 }
     );
   }

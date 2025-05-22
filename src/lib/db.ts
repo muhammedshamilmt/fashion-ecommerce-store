@@ -1,46 +1,9 @@
-import { MongoClient } from 'mongodb';
+import { PrismaClient } from '@prisma/client';
 
-if (!process.env.MONGODB_URI) {
-  throw new Error('Please add your Mongo URI to .env.local');
-}
-
-const uri = process.env.MONGODB_URI;
-const options = {
-  maxPoolSize: 10,
-  serverSelectionTimeoutMS: 5000,
-  socketTimeoutMS: 45000,
+const globalForPrisma = globalThis as unknown as {
+  prisma: PrismaClient | undefined;
 };
 
-let client;
-let clientPromise: Promise<MongoClient>;
+export const prisma = globalForPrisma.prisma ?? new PrismaClient();
 
-if (process.env.NODE_ENV === 'development') {
-  // In development mode, use a global variable so that the value
-  // is preserved across module reloads caused by HMR (Hot Module Replacement).
-  let globalWithMongo = global as typeof globalThis & {
-    _mongoClientPromise?: Promise<MongoClient>;
-  };
-
-  if (!globalWithMongo._mongoClientPromise) {
-    client = new MongoClient(uri, options);
-    globalWithMongo._mongoClientPromise = client.connect();
-  }
-  clientPromise = globalWithMongo._mongoClientPromise;
-} else {
-  // In production mode, it's best to not use a global variable.
-  client = new MongoClient(uri, options);
-  clientPromise = client.connect();
-}
-
-export async function connectToDatabase() {
-  try {
-    const client = await clientPromise;
-    const db = client.db(process.env.MONGODB_DB || 'fashion-ecommerce');
-    return { client, db };
-  } catch (error) {
-    console.error('MongoDB connection error:', error);
-    throw new Error('Failed to connect to database. Please check your MongoDB connection settings.');
-  }
-}
-
-export default clientPromise; 
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma; 

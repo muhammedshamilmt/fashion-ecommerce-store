@@ -3,7 +3,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Product } from "@/utils/data";
-import { X, Upload, Image as ImageIcon } from "lucide-react";
+import { X, Upload, Image as ImageIcon, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Image } from '@imagekit/next';
 import {
@@ -48,8 +48,8 @@ const productSchema = z.object({
   description: z.string().min(1, "Description is required"),
   price: z.coerce.number().positive("Price must be positive"),
   category: z.string().min(1, "Category is required"),
-  inStock: z.boolean().default(true),
-  featured: z.boolean().default(false),
+  inStock: z.boolean(),
+  featured: z.boolean(),
   sizes: z.array(z.string()).min(1, "At least one size is required"),
   colors: z.array(z.string()).min(1, "At least one color is required"),
   images: z.array(z.string()).min(1, "At least one image is required"),
@@ -66,7 +66,7 @@ interface ProductFormProps {
 
 const availableSizes = ["XS", "S", "M", "L", "XL", "XXL", "30", "32", "34", "36", "38", "40", "42", "44"];
 const availableColors = ["Black", "White", "Red", "Blue", "Green", "Yellow", "Brown", "Gray", "Navy", "Pink", "Purple", "Orange", "Beige", "Tan", "Charcoal"];
-const availableCategories = ["men", "women", "kids", "accessories"];
+const availableCategories = ["Mens Thobas","Kids Thobas", "Turban & Caps", "Pajamas","Emarathi","Suadi","Omani","Morocan"];
 
 // Sample placeholder images
 const placeholderImages = [
@@ -86,6 +86,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
 }) => {
   const [uploadedImages, setUploadedImages] = useState<{ url: string; file: File }[]>([]);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const abortController = useRef<AbortController | null>(null);
 
@@ -165,12 +166,14 @@ const ProductForm: React.FC<ProductFormProps> = ({
           throw new Error("Failed to get upload URL");
         }
 
+        const imageUrl = uploadResponse.url;
+
         // Add the uploaded image to the form
         const currentImages = form.getValues("images") || [];
-        form.setValue("images", [...currentImages, uploadResponse.url]);
+        form.setValue("images", [...currentImages, imageUrl]);
         
-        // Add to uploaded images state
-        setUploadedImages(prev => [...prev, { url: uploadResponse.url, file }]);
+        // Add to uploaded images state with explicit type
+        setUploadedImages(prev => [...prev, { url: imageUrl, file }]);
         
         toast.success("Image uploaded successfully");
       } catch (error) {
@@ -197,39 +200,35 @@ const ProductForm: React.FC<ProductFormProps> = ({
   };
 
   const handleSubmit: SubmitHandler<ProductFormValues> = async (data) => {
+    // Prevent double submission
+    if (isSubmitting) {
+      return;
+    }
+
     try {
-      // Handle file uploads first
-      if (uploadedImages.length > 0) {
-        const formData = new FormData();
-        uploadedImages.forEach((img) => {
-          formData.append("image0", img.file);
-        });
+      setIsSubmitting(true);
 
-        const uploadResponse = await fetch("/api/upload", {
-          method: "POST",
-          body: formData,
-        });
+      // Validate required fields
+      if (!data.name || !data.description || !data.price || !data.category) {
+        toast.error("Please fill in all required fields");
+        return;
+      }
 
-        const uploadResult = await uploadResponse.json();
+      // Validate images
+      if (!data.images || data.images.length === 0) {
+        toast.error("Please add at least one product image");
+        return;
+      }
 
-        if (!uploadResponse.ok) {
-          throw new Error(uploadResult.error || "Failed to upload images");
-        }
+      // Validate sizes and colors
+      if (!data.sizes || data.sizes.length === 0) {
+        toast.error("Please select at least one size");
+        return;
+      }
 
-        if (!uploadResult.success) {
-          throw new Error(uploadResult.error || "Failed to upload images");
-        }
-        
-        // Replace temporary URLs with actual uploaded URLs
-        data.images = data.images.map((url) => {
-          const uploadedImage = uploadedImages.find((img) => img.url === url);
-          if (uploadedImage) {
-            return uploadResult.urls[uploadedImages.indexOf(uploadedImage)];
-          }
-          return url;
-        });
-
-        toast.success(uploadResult.message || "Images uploaded successfully");
+      if (!data.colors || data.colors.length === 0) {
+        toast.error("Please select at least one color");
+        return;
       }
 
       // Prepare the request body
@@ -255,14 +254,26 @@ const ProductForm: React.FC<ProductFormProps> = ({
       if (!result.success) {
         throw new Error(result.error || "Failed to save product");
       }
+
+      // Close dialog first
+      onOpenChange(false);
       
+      // Show success message
+      toast.success(initialData ? "Product updated successfully" : "Product added successfully");
+      
+      // Call onSubmit with the result data
       await onSubmit(result.data);
-    onOpenChange(false);
-    toast.success(initialData ? "Product updated successfully" : "Product added successfully");
+      
+      // Reset form and state after successful submission
+      form.reset();
+      setUploadedImages([]);
+      setUploadProgress(0);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred";
       toast.error(errorMessage);
       console.error("Error saving product:", error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -304,7 +315,13 @@ const ProductForm: React.FC<ProductFormProps> = ({
         </DialogHeader>
         
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+          <form 
+            onSubmit={(e) => {
+              e.preventDefault();
+              form.handleSubmit(handleSubmit)(e);
+            }} 
+            className="space-y-6"
+          >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <FormField
                 control={form.control}
@@ -555,11 +572,27 @@ const ProductForm: React.FC<ProductFormProps> = ({
             </div>
             
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => onOpenChange(false)}
+                disabled={isSubmitting}
+              >
                 Cancel
               </Button>
-              <Button type="submit" className="bg-[#4AA79F] hover:bg-[#4AA79F]/90">
-                {initialData ? "Save Changes" : "Add Product"}
+              <Button 
+                type="submit" 
+                className="bg-[#4AA79F] hover:bg-[#4AA79F]/90"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    {initialData ? "Saving Changes..." : "Adding Product..."}
+                  </>
+                ) : (
+                  initialData ? "Save Changes" : "Add Product"
+                )}
               </Button>
             </DialogFooter>
           </form>

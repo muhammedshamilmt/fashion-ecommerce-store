@@ -1,135 +1,129 @@
-import React from "react";
-import Link from "next/link";
-import { Facebook, Instagram, Twitter, Youtube, Mail, Phone, MapPin } from "lucide-react";
+'use client';
 
-const Footer: React.FC = () => {
+import React, { useEffect, useState } from "react";
+import Link from "next/link";
+import { MapPin, Phone, Mail, Facebook, Twitter, Instagram, Youtube } from "lucide-react";
+
+interface ContactInfo {
+  storeAddress: string;
+  phoneNumber: string;
+  contactEmail: string;
+}
+
+const Footer = () => {
+  const [contactInfo, setContactInfo] = useState<ContactInfo>({
+    storeAddress: '',
+    phoneNumber: '',
+    contactEmail: ''
+  });
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const response = await fetch('/api/settings');
+        const result = await response.json();
+        
+        if (result.success) {
+          setContactInfo(result.data);
+        }
+      } catch (error) {
+        console.error('Error fetching settings:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchSettings();
+  }, []);
+
   return (
-    <footer className="bg-[#2B3972] text-white pt-16 pb-8">
-      <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {/* Brand Column */}
+    <footer className="bg-[#2B3972] text-white">
+      <div className="container mx-auto px-4 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* Company Info */}
           <div className="space-y-4">
-            <h2 className="text-2xl font-bold">FashionFit</h2>
-            <p className="text-gray-300 max-w-xs">
-              Revolutionizing online fashion shopping with AI-powered 3D scanning technology for the perfect fit.
+            <h3 className="text-xl font-semibold">FashionFit</h3>
+            <p className="text-gray-300">
+              Your one-stop destination for trendy and affordable fashion.
             </p>
             <div className="flex space-x-4">
-              <a
-                href="#"
-                className="text-white hover:text-[#3FB185] transition-colors duration-300"
-                aria-label="Facebook"
-              >
+              <a href="#" className="text-gray-300 hover:text-[#3FB185] transition-colors duration-300">
                 <Facebook size={20} />
               </a>
-              <a
-                href="#"
-                className="text-white hover:text-[#3FB185] transition-colors duration-300"
-                aria-label="Instagram"
-              >
-                <Instagram size={20} />
-              </a>
-              <a
-                href="#"
-                className="text-white hover:text-[#3FB185] transition-colors duration-300"
-                aria-label="Twitter"
-              >
+              <a href="#" className="text-gray-300 hover:text-[#3FB185] transition-colors duration-300">
                 <Twitter size={20} />
               </a>
-              <a
-                href="#"
-                className="text-white hover:text-[#3FB185] transition-colors duration-300"
-                aria-label="Youtube"
-              >
+              <a href="#" className="text-gray-300 hover:text-[#3FB185] transition-colors duration-300">
+                <Instagram size={20} />
+              </a>
+              <a href="#" className="text-gray-300 hover:text-[#3FB185] transition-colors duration-300">
                 <Youtube size={20} />
               </a>
             </div>
           </div>
 
-          {/* Shop Column */}
+          {/* Quick Links */}
           <div className="space-y-4">
-            <h3 className="text-xl font-semibold">Shop</h3>
+            <h3 className="text-xl font-semibold">Quick Links</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/products?category=Emarathi" className="text-gray-300 hover:text-[#3FB185] transition-colors duration-300">Emarathi</Link>
+                <Link href="/about" className="text-gray-300 hover:text-[#3FB185] transition-colors duration-300">
+                  About Us
+                </Link>
               </li>
               <li>
-                <Link href="/products?category=Omani" className="text-gray-300 hover:text-[#3FB185] transition-colors duration-300">Omani</Link>
+                <Link href="/contact" className="text-gray-300 hover:text-[#3FB185] transition-colors duration-300">
+                  Contact
+                </Link>
               </li>
               <li>
-                <Link href="/products?category=Saudi" className="text-gray-300 hover:text-[#3FB185] transition-colors duration-300">Saudi</Link>
+                <Link href="/faq" className="text-gray-300 hover:text-[#3FB185] transition-colors duration-300">
+                  FAQ
+                </Link>
               </li>
               <li>
-                <Link href="/products?category=Morocan" className="text-gray-300 hover:text-[#3FB185] transition-colors duration-300">Morocan</Link>
-              </li>
-              
-            </ul>
-          </div>
-
-          {/* Company Column */}
-          <div className="space-y-4">
-            <h3 className="text-xl font-semibold">Company</h3>
-            <ul className="space-y-2">
-              <li>
-                <Link href="/about" className="text-gray-300 hover:text-[#3FB185] transition-colors duration-300">About Us</Link>
-              </li>
-              <li>
-                <Link href="/contact" className="text-gray-300 hover:text-[#3FB185] transition-colors duration-300">Contact</Link>
-              </li>
-              <li>
-                <Link href="/careers" className="text-gray-300 hover:text-[#3FB185] transition-colors duration-300">Careers</Link>
-              </li>
-              <li>
-                <Link href="/privacypolicy" className="text-gray-300 hover:text-[#3FB185] transition-colors duration-300">Privacy Policy</Link>
-              </li>
-              <li>
-                <Link href="/terms" className="text-gray-300 hover:text-[#3FB185] transition-colors duration-300">Terms & Conditions</Link>
+                <Link href="/shipping" className="text-gray-300 hover:text-[#3FB185] transition-colors duration-300">
+                  Shipping & Returns
+                </Link>
               </li>
             </ul>
           </div>
 
-          {/* Contact Column */}
+          {/* Contact Us */}
           <div className="space-y-4">
             <h3 className="text-xl font-semibold">Contact Us</h3>
             <ul className="space-y-4">
               <li className="flex items-start space-x-2">
                 <MapPin size={20} className="mt-1 flex-shrink-0" />
                 <span className="text-gray-300">
-                  123 Fashion Street, Design District, New York, NY 10001
+                  {isLoading ? 'Loading...' : contactInfo.storeAddress || 'Address not available'}
                 </span>
               </li>
               <li className="flex items-center space-x-2">
                 <Phone size={20} className="flex-shrink-0" />
-                <a href="tel:+1234567890" className="text-gray-300 hover:text-[#3FB185] transition-colors duration-300">
-                  +1 (234) 567-890
+                <a 
+                  href={`tel:${contactInfo.phoneNumber}`} 
+                  className="text-gray-300 hover:text-[#3FB185] transition-colors duration-300"
+                >
+                  {isLoading ? 'Loading...' : contactInfo.phoneNumber || 'Phone not available'}
                 </a>
               </li>
               <li className="flex items-center space-x-2">
                 <Mail size={20} className="flex-shrink-0" />
-                <a href="mailto:info@fashionfit.com" className="text-gray-300 hover:text-[#3FB185] transition-colors duration-300">
-                  info@fashionfit.com
+                <a 
+                  href={`mailto:${contactInfo.contactEmail}`} 
+                  className="text-gray-300 hover:text-[#3FB185] transition-colors duration-300"
+                >
+                  {isLoading ? 'Loading...' : contactInfo.contactEmail || 'Email not available'}
                 </a>
               </li>
             </ul>
           </div>
         </div>
 
-        <div className="border-t border-[#FFFFFF]/20 mt-12 pt-8">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <p className="text-gray-400 text-sm">
-              &copy; {new Date().getFullYear()} FashionFit. All rights reserved.
-            </p>
-            <div className="flex space-x-6 mt-4 md:mt-0">
-              <Link href="/privacypolicy" className="text-gray-400 hover:text-[#3FB185] text-sm transition-colors duration-300">
-                Privacy Policy
-              </Link>
-              <Link href="/terms" className="text-gray-400 hover:text-[#3FB185] text-sm transition-colors duration-300">
-                Terms of Service
-              </Link>
-              <Link href="/sitemap" className="text-gray-400 hover:text-[#3FB185] text-sm transition-colors duration-300">
-                Sitemap
-              </Link>
-            </div>
-          </div>
+        <div className="border-t border-white/10 mt-12 pt-8 text-center text-gray-300">
+          <p>&copy; {new Date().getFullYear()} FashionFit. All rights reserved.</p>
         </div>
       </div>
     </footer>

@@ -22,24 +22,28 @@ export async function GET() {
     const { db } = await connectToDatabase();
     
     // Get settings from the database
-    const settings = await db.collection("settings").findOne({});
+    const settings = await db.collection('settings').findOne({});
     
     if (!settings) {
-      return NextResponse.json({ 
-        success: false, 
-        error: 'Settings not found' 
+      return NextResponse.json({
+        success: false,
+        error: "Settings not found"
       }, { status: 404 });
     }
 
-    return NextResponse.json({ 
-      success: true, 
-      data: settings 
+    return NextResponse.json({
+      success: true,
+      data: {
+        storeAddress: settings.storeAddress || '',
+        phoneNumber: settings.phoneNumber || '',
+        contactEmail: settings.contactEmail || ''
+      }
     });
   } catch (error) {
     console.error('Error fetching settings:', error);
-    return NextResponse.json({ 
-      success: false, 
-      error: 'Failed to fetch settings' 
+    return NextResponse.json({
+      success: false,
+      error: "Failed to fetch settings"
     }, { status: 500 });
   }
 }

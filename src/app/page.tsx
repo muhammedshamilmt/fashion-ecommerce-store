@@ -237,7 +237,7 @@ const Index = () => {
                 </div>
                 <div className="md:w-1/2">
                   <img 
-                    src="/public/thobas by rack.png" 
+                    src="/tobasbyrack.png" 
                     alt="Fashion Model" 
                     className="w-full h-full object-cover"
                   />

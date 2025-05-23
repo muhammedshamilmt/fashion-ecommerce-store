@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Mail, MapPin, Phone, Send, MessageCircle, Upload, X, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import Navbar from "@/components/layout/Navbar";
@@ -21,6 +21,12 @@ interface ContactFormData {
   image: File | null;
 }
 
+interface Settings {
+  storeAddress: string;
+  contactEmail: string;
+  phoneNumber: string;
+}
+
 const Contact = () => {
   const [formData, setFormData] = useState<ContactFormData>({
     name: "",
@@ -30,9 +36,33 @@ const Contact = () => {
     priority: "medium",
     image: null
   });
+  const [settings, setSettings] = useState<Settings | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const response = await fetch('/api/settings');
+        const result = await response.json();
+
+        if (result.success) {
+          setSettings(result.data);
+        } else {
+          toast.error('Failed to load contact information');
+        }
+      } catch (error) {
+        console.error('Error fetching settings:', error);
+        toast.error('Failed to load contact information');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchSettings();
+  }, []);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -178,10 +208,10 @@ const Contact = () => {
                       </div>
                       <div>
                         <h3 className="font-medium text-lg text-gray-900">Visit Us</h3>
-                        <p className="text-gray-600 mt-1">
-                          123 Fashion Avenue<br />
-                          New York, NY 10001<br />
-                          United States
+                        <p className="text-gray-600 mt-1 whitespace-pre-line">
+                          {isLoading ? (
+                            <div className="h-4 bg-gray-200 rounded animate-pulse w-32"></div>
+                          ) : settings?.storeAddress || "Address not available"}
                         </p>
                       </div>
                     </div>
@@ -193,13 +223,13 @@ const Contact = () => {
                       <div>
                         <h3 className="font-medium text-lg text-gray-900">Email Us</h3>
                         <p className="text-gray-600 mt-1">
-                          <a href="mailto:info@fashionfit.com" className="hover:text-primary">
-                            info@fashionfit.com
-                          </a>
-                          <br />
-                          <a href="mailto:support@fashionfit.com" className="hover:text-primary">
-                            support@fashionfit.com
-                          </a>
+                          {isLoading ? (
+                            <div className="h-4 bg-gray-200 rounded animate-pulse w-32"></div>
+                          ) : (
+                            <a href={`mailto:${settings?.contactEmail}`} className="hover:text-primary">
+                              {settings?.contactEmail || "Email not available"}
+                            </a>
+                          )}
                         </p>
                       </div>
                     </div>
@@ -211,9 +241,13 @@ const Contact = () => {
                       <div>
                         <h3 className="font-medium text-lg text-gray-900">Call Us</h3>
                         <p className="text-gray-600 mt-1">
-                          <a href="tel:+12125551234" className="hover:text-primary">
-                            +1 (212) 555-1234
-                          </a>
+                          {isLoading ? (
+                            <div className="h-4 bg-gray-200 rounded animate-pulse w-32"></div>
+                          ) : (
+                            <a href={`tel:${settings?.phoneNumber}`} className="hover:text-primary">
+                              {settings?.phoneNumber || "Phone number not available"}
+                            </a>
+                          )}
                           <br />
                           <span className="text-sm">Monday-Friday: 9AM-6PM EST</span>
                         </p>

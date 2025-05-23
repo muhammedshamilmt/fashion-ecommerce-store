@@ -25,40 +25,22 @@ export async function GET() {
     const settings = await db.collection("settings").findOne({});
     
     if (!settings) {
-      // Return default settings if none exist
-      return NextResponse.json({
-        success: true,
-        data: {
-          storeName: "FashionFit",
-          contactEmail: "contact@fashionfit.com",
-          phoneNumber: "+1 (555) 123-4567",
-          storeAddress: "123 Fashion Avenue, Suite 500\nNew York, NY 10001\nUnited States",
-          currency: "usd",
-          adminProfile: {
-            fullName: "Alex Johnson",
-            email: "alex@fashionfit.com",
-            role: "Store Administrator",
-            phone: "+1 (555) 987-6543",
-            photoURL: "https://i.pravatar.cc/150?img=3"
-          }
-        }
-      });
+      return NextResponse.json({ 
+        success: false, 
+        error: 'Settings not found' 
+      }, { status: 404 });
     }
 
-    return NextResponse.json({
-      success: true,
-      data: settings
+    return NextResponse.json({ 
+      success: true, 
+      data: settings 
     });
   } catch (error) {
     console.error('Error fetching settings:', error);
-    return NextResponse.json(
-      { 
-        success: false, 
-        error: 'Failed to fetch settings',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      },
-      { status: 500 }
-    );
+    return NextResponse.json({ 
+      success: false, 
+      error: 'Failed to fetch settings' 
+    }, { status: 500 });
   }
 }
 

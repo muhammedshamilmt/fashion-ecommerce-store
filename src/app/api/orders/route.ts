@@ -14,6 +14,7 @@ const orderItemSchema = z.object({
 });
 
 const orderSchema = z.object({
+  orderNumber: z.string().min(1, "Order number is required"),
   customerInfo: z.object({
     firstName: z.string().min(1, "First name is required"),
     lastName: z.string().min(1, "Last name is required"),
@@ -32,6 +33,13 @@ const orderSchema = z.object({
   total: z.number(),
   paymentMethod: z.string(),
   status: z.enum(["pending", "processing", "shipped", "delivered"]).default("pending"),
+  currentLocation: z.string(),
+  estimatedDelivery: z.string(),
+  trackingHistory: z.array(z.object({
+    status: z.string(),
+    location: z.string(),
+    timestamp: z.string()
+  }))
 });
 
 export async function GET(request: Request) {
@@ -79,6 +87,18 @@ export async function POST(request: Request) {
     const validatedData = orderSchema.parse(body);
 
     const { db } = await connectToDatabase();
+    
+    // Check if order number already exists
+    const existingOrder = await db.collection("orders").findOne({
+      orderNumber: validatedData.orderNumber
+    });
+
+    if (existingOrder) {
+      return NextResponse.json(
+        { success: false, error: "Order number already exists" },
+        { status: 400 }
+      );
+    }
     
     // Create new order
     const order = {

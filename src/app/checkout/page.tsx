@@ -1,6 +1,6 @@
 'use client';
 
-import React from "react";
+import React, { useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
@@ -13,9 +13,15 @@ const Checkout = () => {
   const router = useRouter();
   const { items, subtotal } = useCart();
   
-  // Redirect to cart if it's empty
+  useEffect(() => {
+    // Redirect to cart if it's empty
+    if (items.length === 0) {
+      router.push('/cart');
+    }
+  }, [items.length, router]);
+
+  // Show loading state while checking cart
   if (items.length === 0) {
-    router.push('/cart');
     return null;
   }
 

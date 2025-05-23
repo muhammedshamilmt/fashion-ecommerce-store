@@ -74,6 +74,7 @@ const Navbar: React.FC = () => {
             <CollectionsMenu />
             <Link href="/about" className="nav-link">About</Link>
             <Link href="/contact" className="nav-link">Contact</Link>
+            <Link href="/track-order" className="nav-link">Track Order</Link>
           </div>
 
           {/* Desktop Icons */}
@@ -222,6 +223,7 @@ const Navbar: React.FC = () => {
         <div className="flex flex-col space-y-6 px-6 pt-4">
           <Link href="/" className="text-lg font-medium text-fashion-primary hover:text-fashion-primary/80">Home</Link>
           <Link href="/products" className="text-lg font-medium text-fashion-primary hover:text-fashion-primary/80">Shop</Link>
+          <Link href="/track-order" className="text-lg font-medium text-fashion-primary hover:text-fashion-primary/80">Track Order</Link>
 
           <div className="space-y-2">
             <p className="text-sm font-semibold text-fashion-primary/60 uppercase tracking-wider">Collections</p>

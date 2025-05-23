@@ -50,20 +50,18 @@ const Footer: React.FC = () => {
             <h3 className="text-xl font-semibold">Shop</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/products?category=men" className="text-gray-300 hover:text-[#3FB185] transition-colors duration-300">Men's Collection</Link>
+                <Link href="/products?category=Emarathi" className="text-gray-300 hover:text-[#3FB185] transition-colors duration-300">Emarathi</Link>
               </li>
               <li>
-                <Link href="/products?category=women" className="text-gray-300 hover:text-[#3FB185] transition-colors duration-300">Women's Collection</Link>
+                <Link href="/products?category=Omani" className="text-gray-300 hover:text-[#3FB185] transition-colors duration-300">Omani</Link>
               </li>
               <li>
-                <Link href="/products" className="text-gray-300 hover:text-[#3FB185] transition-colors duration-300">New Arrivals</Link>
+                <Link href="/products?category=Saudi" className="text-gray-300 hover:text-[#3FB185] transition-colors duration-300">Saudi</Link>
               </li>
               <li>
-                <Link href="/products?featured=true" className="text-gray-300 hover:text-[#3FB185] transition-colors duration-300">Featured Items</Link>
+                <Link href="/products?category=Morocan" className="text-gray-300 hover:text-[#3FB185] transition-colors duration-300">Morocan</Link>
               </li>
-              <li>
-                <Link href="/products?discount=true" className="text-gray-300 hover:text-[#3FB185] transition-colors duration-300">Discounts</Link>
-              </li>
+              
             </ul>
           </div>
 
@@ -81,7 +79,7 @@ const Footer: React.FC = () => {
                 <Link href="/careers" className="text-gray-300 hover:text-[#3FB185] transition-colors duration-300">Careers</Link>
               </li>
               <li>
-                <Link href="/privacy-policy" className="text-gray-300 hover:text-[#3FB185] transition-colors duration-300">Privacy Policy</Link>
+                <Link href="/privacypolicy" className="text-gray-300 hover:text-[#3FB185] transition-colors duration-300">Privacy Policy</Link>
               </li>
               <li>
                 <Link href="/terms" className="text-gray-300 hover:text-[#3FB185] transition-colors duration-300">Terms & Conditions</Link>
@@ -121,7 +119,7 @@ const Footer: React.FC = () => {
               &copy; {new Date().getFullYear()} FashionFit. All rights reserved.
             </p>
             <div className="flex space-x-6 mt-4 md:mt-0">
-              <Link href="/privacy-policy" className="text-gray-400 hover:text-[#3FB185] text-sm transition-colors duration-300">
+              <Link href="/privacypolicy" className="text-gray-400 hover:text-[#3FB185] text-sm transition-colors duration-300">
                 Privacy Policy
               </Link>
               <Link href="/terms" className="text-gray-400 hover:text-[#3FB185] text-sm transition-colors duration-300">

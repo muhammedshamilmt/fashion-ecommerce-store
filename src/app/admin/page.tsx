@@ -178,7 +178,7 @@ const AdminPage = () => {
             {activeTab === "settings" && "Settings"}
           </h1>
 
-          <div className="flex items-center space-x-4">
+          {/* <div className="flex items-center space-x-4">
             {(activeTab === "products" ||
               activeTab === "orders" ||
               activeTab === "customers") && (
@@ -211,7 +211,7 @@ const AdminPage = () => {
             >
               <LogOut size={18} />
             </Button>
-          </div>
+          </div> */}
         </div>
 
         {/* Tab Content */}

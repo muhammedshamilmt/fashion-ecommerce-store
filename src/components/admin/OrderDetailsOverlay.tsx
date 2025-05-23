@@ -1,8 +1,11 @@
 'use client'
 
 import React from "react";
-import { X, MapPin, Phone, Mail, Package, CreditCard, Calendar } from "lucide-react";
+import { X, MapPin, Phone, Mail, Package, CreditCard, Calendar, Printer, Download } from "lucide-react";
 import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 interface OrderDetailsOverlayProps {
   order: {
@@ -40,6 +43,68 @@ interface OrderDetailsOverlayProps {
 }
 
 const OrderDetailsOverlay: React.FC<OrderDetailsOverlayProps> = ({ order, onClose }) => {
+  const handlePrint = () => {
+    window.print();
+  };
+
+  const handleExport = () => {
+    const doc = new jsPDF();
+    let yPos = 20; // Starting Y position
+
+    // Shipping Information Section Header
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(74, 167, 159); // Use primary color for heading
+    doc.text('Shipping Information', 14, yPos);
+    doc.setFont('helvetica', 'normal'); // Reset font style
+    doc.setTextColor(0); // Reset text color
+    yPos += 8; // Space after heading
+
+    // Shipping Information Details
+    doc.setFontSize(12);
+
+    // Customer Name
+    doc.setFontSize(10);
+    doc.setTextColor(100); // Grey color for labels
+    doc.text('Customer Name', 14, yPos);
+    doc.setFontSize(12);
+    doc.setTextColor(0);
+    doc.text(`${order.customerInfo.firstName} ${order.customerInfo.lastName}`, 14, yPos + 5);
+    yPos += 15; // Space for name
+
+    // Email
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text('Email', 14, yPos);
+    doc.setFontSize(12);
+    doc.setTextColor(0);
+    doc.text(order.customerInfo.email, 14, yPos + 5);
+    yPos += 15; // Space for email
+
+    // Phone
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text('Phone', 14, yPos);
+    doc.setFontSize(12);
+    doc.setTextColor(0);
+    doc.text(order.customerInfo.phone, 14, yPos + 5);
+    yPos += 15; // Space for phone
+
+    // Address
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text('Address', 14, yPos);
+    doc.setFontSize(12);
+    doc.setTextColor(0);
+    const fullAddress = `${order.customerInfo.address}, ${order.customerInfo.city}, ${order.customerInfo.state} ${order.customerInfo.zipCode}, ${order.customerInfo.country}`;
+    const splitAddress = doc.splitTextToSize(fullAddress, 180);
+    doc.text(splitAddress, 14, yPos + 5);
+    yPos += (splitAddress.length * 5) + 10;
+
+    // Save the PDF
+    doc.save(`order-${order.orderNumber || order._id}-shipping.pdf`);
+  };
+
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -48,12 +113,32 @@ const OrderDetailsOverlay: React.FC<OrderDetailsOverlayProps> = ({ order, onClos
           <h2 className="text-xl font-semibold text-fashion-primary">
             Order #{order.orderNumber || order._id}
           </h2>
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-700"
-          >
-            <X size={24} />
-          </button>
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handlePrint}
+              className="flex items-center space-x-2"
+            >
+              <Printer size={16} />
+              <span>Print</span>
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleExport}
+              className="flex items-center space-x-2"
+            >
+              <Download size={16} />
+              <span>Export PDF</span>
+            </Button>
+            <button
+              onClick={onClose}
+              className="text-gray-500 hover:text-gray-700 ml-2"
+            >
+              <X size={24} />
+            </button>
+          </div>
         </div>
 
         {/* Content */}

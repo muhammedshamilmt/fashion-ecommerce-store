@@ -62,7 +62,7 @@ const TurbancapsPage = async () => {
   
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar/>
+        <Navbar/>
       <div className="container mx-auto py-16 px-4">
         <div className="flex items-center mb-6">
           <Button variant="ghost" size="sm" asChild className="mr-2">
@@ -81,15 +81,15 @@ const TurbancapsPage = async () => {
         </div>
         
         <React.Suspense fallback={<LoadingSkeleton />}>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {turbancapsProducts.map((product, index) => (
-              <ProductCard 
-                key={product._id} 
-                product={product} 
-                index={index} 
-              />
-            ))}
-          </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {turbancapsProducts.map((product, index) => (
+            <ProductCard 
+              key={product._id} 
+              product={product} 
+              index={index} 
+            />
+          ))}
+        </div>
         </React.Suspense>
       </div>
     </div>

@@ -1,4 +1,3 @@
-
 import React from "react";
 import Link from "next/link";
 import { 
@@ -26,7 +25,7 @@ const CollectionsMenu = () => {
               >
                 <div className="text-sm font-medium leading-none">Mens Thobas</div>
                 <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                  Explore elegant designs for every occasion
+                  Elegant and traditional mens thobas for every occasion
                 </p>
               </Link>
               <Link
@@ -35,7 +34,7 @@ const CollectionsMenu = () => {
               >
                 <div className="text-sm font-medium leading-none">Kids Thobas</div>
                 <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                  Premium selection of men's clothing and accessories
+                  Comfortable and stylish thobas for children
                 </p>
               </Link>
               <Link
@@ -44,7 +43,7 @@ const CollectionsMenu = () => {
               >
                 <div className="text-sm font-medium leading-none">Turban & Caps</div>
                 <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                  Complete your look with stylish accessories
+                  Traditional turbans and modern caps to complete your look
                 </p>
               </Link>
               <Link
@@ -53,9 +52,18 @@ const CollectionsMenu = () => {
               >
                 <div className="text-sm font-medium leading-none">Pajamas</div>
                 <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                  The latest fashion trends and designs
+                  Comfortable and stylish pajamas for all ages
                 </p>
               </Link>
+              {/* <Link
+                href="/emarathi"
+                className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-fashion-light hover:text-fashion-primary focus:bg-fashion-light focus:text-fashion-primary"
+              >
+                <div className="text-sm font-medium leading-none">Emarathi</div>
+                <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                  Traditional Emarathi designs and patterns
+                </p>
+              </Link> */}
             </div>
           </NavigationMenuContent>
         </NavigationMenuItem>

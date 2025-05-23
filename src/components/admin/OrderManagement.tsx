@@ -11,13 +11,19 @@ import {
   Clock,
   MoreHorizontal,
   Eye,
-  Loader2
+  Loader2,
+  Printer,
+  Download
 } from "lucide-react";
 import { toast } from "sonner";
 import OrderDetailsOverlay from "./OrderDetailsOverlay";
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import { Button } from "@/components/ui/button";
 
 interface Order {
   _id: string;
+  orderNumber?: number;
   customerInfo: {
     firstName: string;
     lastName: string;
@@ -30,15 +36,13 @@ interface Order {
     country: string;
   };
   items: Array<{
-    product: {
-      id: string;
-      name: string;
-      price: number;
-      images: string[];
-    };
+    productId: string;
+    name: string;
+    price: number;
     quantity: number;
     size: string;
     color: string;
+    image: string;
   }>;
   subtotal: number;
   shipping: number;
@@ -57,6 +61,8 @@ const OrderManagement: React.FC = () => {
   const [dateSort, setDateSort] = useState<"asc" | "desc">("desc");
   const [isLoading, setIsLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const ordersPerPage = 10;
   
   // Fetch orders
   useEffect(() => {
@@ -74,7 +80,24 @@ const OrderManagement: React.FC = () => {
       }
 
       if (result.success) {
-        setOrders(result.data);
+        // Transform the data to match the Order interface
+        const transformedOrders = result.data.map((order: any) => ({
+          ...order,
+          items: order.items.map((item: any) => {
+            // Handle different product data structures
+            const product = item.product || {};
+            return {
+              productId: product.id || product._id || item.productId || '',
+              name: product.name || item.name || '',
+              price: product.price || item.price || 0,
+              quantity: item.quantity || 0,
+              size: item.size || '',
+              color: item.color || '',
+              image: (product.images && product.images[0]) || item.image || ''
+            };
+          })
+        }));
+        setOrders(transformedOrders);
       }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to fetch orders");
@@ -95,6 +118,17 @@ const OrderManagement: React.FC = () => {
         ? new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         : new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
     });
+
+  // Calculate pagination
+  const indexOfLastOrder = currentPage * ordersPerPage;
+  const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
+  const currentOrders = filteredOrders.slice(indexOfFirstOrder, indexOfLastOrder);
+  const totalPages = Math.ceil(filteredOrders.length / ordersPerPage);
+
+  // Handle page change
+  const handlePageChange = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+  };
   
   const handleUpdateStatus = async (orderId: string, newStatus: Order["status"]) => {
     try {
@@ -155,6 +189,69 @@ const OrderManagement: React.FC = () => {
     }
   };
 
+  const handlePrintAll = () => {
+    window.print();
+  };
+
+  const handleExportAll = () => {
+    const doc = new jsPDF();
+    
+    // Add title
+    doc.setFontSize(20);
+    doc.text('Orders Report', 14, 20);
+    doc.setFontSize(12);
+    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 30);
+    
+    // Create table
+    autoTable(doc, {
+      startY: 40,
+      head: [['Order ID', 'Customer', 'Date', 'Total', 'Status']],
+      body: filteredOrders.map(order => [
+        order._id,
+        `${order.customerInfo.firstName} ${order.customerInfo.lastName}`,
+        new Date(order.createdAt).toLocaleDateString(),
+        `₹${order.total.toFixed(2)}`,
+        order.status.charAt(0).toUpperCase() + order.status.slice(1)
+      ]),
+      theme: 'grid',
+      headStyles: { fillColor: [74, 167, 159] },
+      styles: { fontSize: 10 },
+      columnStyles: {
+        0: { cellWidth: 40 },
+        1: { cellWidth: 50 },
+        2: { cellWidth: 30 },
+        3: { cellWidth: 30 },
+        4: { cellWidth: 30 }
+      }
+    });
+    
+    // Add summary
+    const finalY = (doc as any).lastAutoTable.finalY + 10;
+    doc.setFontSize(14);
+    doc.text('Summary', 14, finalY);
+    
+    autoTable(doc, {
+      startY: finalY + 5,
+      body: [
+        ['Total Orders', filteredOrders.length.toString()],
+        ['Total Revenue', `₹${filteredOrders.reduce((sum, order) => sum + order.total, 0).toFixed(2)}`],
+        ['Pending Orders', filteredOrders.filter(o => o.status === 'pending').length.toString()],
+        ['Processing Orders', filteredOrders.filter(o => o.status === 'processing').length.toString()],
+        ['Shipped Orders', filteredOrders.filter(o => o.status === 'shipped').length.toString()],
+        ['Delivered Orders', filteredOrders.filter(o => o.status === 'delivered').length.toString()]
+      ],
+      theme: 'plain',
+      styles: { fontSize: 12 },
+      columnStyles: {
+        0: { cellWidth: 100 },
+        1: { cellWidth: 70, halign: 'right' }
+      }
+    });
+    
+    // Save the PDF
+    doc.save('orders-report.pdf');
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -167,7 +264,29 @@ const OrderManagement: React.FC = () => {
     <div className="w-full space-y-6 animate-fade-in">
       {/* Header and filters */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
-        <h2 className="text-2xl font-bold text-fashion-primary">Order Management</h2>
+        <div className="flex items-center space-x-4">
+          <h2 className="text-2xl font-bold text-fashion-primary">Order Management</h2>
+          <div className="flex space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handlePrintAll}
+              className="flex items-center space-x-2"
+            >
+              <Printer size={16} />
+              <span>Print All</span>
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleExportAll}
+              className="flex items-center space-x-2"
+            >
+              <Download size={16} />
+              <span>Export PDF</span>
+            </Button>
+          </div>
+        </div>
         
         <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 w-full md:w-auto">
           <div className="relative">
@@ -234,10 +353,10 @@ const OrderManagement: React.FC = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredOrders.map((order, index) => (
+              {currentOrders.map((order, index) => (
                 <tr key={order._id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-fashion-primary">
-                  # Order{index + 1}
+                  # Order{(currentPage - 1) * ordersPerPage + index + 1}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-fashion-primary">
                     {order.customerInfo.firstName} {order.customerInfo.lastName}
@@ -329,17 +448,44 @@ const OrderManagement: React.FC = () => {
       {/* Pagination */}
       <div className="flex justify-between items-center">
         <p className="text-sm text-fashion-primary/60">
-          Showing <span className="font-medium">{filteredOrders.length}</span> of{" "}
-          <span className="font-medium">{orders.length}</span> orders
+          Showing <span className="font-medium">{indexOfFirstOrder + 1}</span> to{" "}
+          <span className="font-medium">
+            {Math.min(indexOfLastOrder, filteredOrders.length)}
+          </span> of{" "}
+          <span className="font-medium">{filteredOrders.length}</span> orders
         </p>
         <div className="flex space-x-1">
-          <button className="px-3 py-1 bg-white border border-gray-300 rounded-md text-sm text-fashion-primary hover:bg-gray-50">
+          <button 
+            className={`px-3 py-1 border border-gray-300 rounded-md text-sm text-fashion-primary hover:bg-gray-50 ${
+              currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'bg-white'
+            }`}
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
             Previous
           </button>
-          <button className="px-3 py-1 bg-fashion-primary text-white rounded-md text-sm">
-            1
-          </button>
-          <button className="px-3 py-1 bg-white border border-gray-300 rounded-md text-sm text-fashion-primary hover:bg-gray-50">
+          
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+            <button
+              key={page}
+              className={`px-3 py-1 rounded-md text-sm ${
+                currentPage === page
+                  ? 'bg-fashion-primary text-white'
+                  : 'bg-white border border-gray-300 text-fashion-primary hover:bg-gray-50'
+              }`}
+              onClick={() => handlePageChange(page)}
+            >
+              {page}
+            </button>
+          ))}
+          
+          <button 
+            className={`px-3 py-1 border border-gray-300 rounded-md text-sm text-fashion-primary hover:bg-gray-50 ${
+              currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : 'bg-white'
+            }`}
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+          >
             Next
           </button>
         </div>

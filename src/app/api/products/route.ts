@@ -125,10 +125,10 @@ export async function GET(request: Request) {
     const query: any = {};
     if (category && category !== 'all') {
       // Handle specific categories
-      if (category === 'Mens Thobas' || category === 'Kids Thobas' || category === 'Turban & Caps' || category === 'Pajamas') {
+      if (category === 'Mens Thobas' || category === 'Kids Thobas' || category === 'Turban & Caps' || category === 'Pajamas' || category === 'Emarathi') {
         query.category = category;
       } else {
-        query.category = category;
+      query.category = category;
       }
     }
     if (featured === 'true') {

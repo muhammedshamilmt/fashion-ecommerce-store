@@ -271,3 +271,43 @@
   opacity: 0;
   transition: opacity 300ms;
 }
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  
+  .fixed.inset-0,
+  .fixed.inset-0 * {
+    visibility: visible;
+  }
+  
+  .fixed.inset-0 {
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+  
+  .bg-black\/50 {
+    background: none;
+  }
+  
+  .bg-white {
+    box-shadow: none;
+  }
+  
+  /* Hide buttons when printing */
+  button {
+    display: none !important;
+  }
+  
+  /* Ensure content fits on page */
+  .max-h-\[90vh\] {
+    max-height: none;
+  }
+  
+  /* Add page breaks where needed */
+  .border-b {
+    break-after: page;
+  }
+}

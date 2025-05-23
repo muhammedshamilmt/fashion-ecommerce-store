@@ -59,6 +59,7 @@ interface Stats {
   pendingOrders: number;
   lastMonthRevenue: number;
   dailySales: DailySales[];
+  monthlyRevenue: { month: string; revenue: number }[];
   recentOrders: Order[];
 }
 
@@ -91,6 +92,7 @@ const Dashboard: React.FC = () => {
     pendingOrders: 0,
     lastMonthRevenue: 0,
     dailySales: [],
+    monthlyRevenue: [],
     recentOrders: []
   });
 
@@ -354,16 +356,22 @@ const Dashboard: React.FC = () => {
         <Card>
           <CardHeader className="pb-0">
             <CardTitle>Revenue Trend</CardTitle>
-            <CardDescription>Last 7 days performance</CardDescription>
+            <CardDescription>Monthly revenue for the last 12 months</CardDescription>
           </CardHeader>
           <CardContent className="h-80 pt-6">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart
-                data={last7DaysData}
+                data={stats.monthlyRevenue}
                 margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
               >
                 <CartesianGrid strokeDasharray="3 3" opacity={0.1} />
-                <XAxis dataKey="month" />
+                <XAxis 
+                  dataKey="month" 
+                  tickFormatter={(value) => {
+                    const [year, month] = value.split('-');
+                    return new Date(parseInt(year), parseInt(month) - 1).toLocaleString('default', { month: 'short' });
+                  }}
+                />
                 <YAxis />
                 <Tooltip
                   contentStyle={{
@@ -372,11 +380,15 @@ const Dashboard: React.FC = () => {
                     boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
                     border: 'none'
                   }}
-                  formatter={(value) => [`$${value}`, 'Revenue']}
+                  formatter={(value) => [`₹${value}`, 'Revenue']}
+                  labelFormatter={(value) => {
+                    const [year, month] = value.split('-');
+                    return new Date(parseInt(year), parseInt(month) - 1).toLocaleString('default', { month: 'long', year: 'numeric' });
+                  }}
                 />
                 <Line 
                   type="monotone" 
-                  dataKey="sales" 
+                  dataKey="revenue" 
                   stroke="#4f46e5" 
                   strokeWidth={2}
                   dot={{ fill: '#4f46e5', r: 4 }}

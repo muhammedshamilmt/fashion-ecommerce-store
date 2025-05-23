@@ -1,25 +1,31 @@
 import React from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { Product, products } from "@/utils/data";
 import FeaturedProductsGrid from "./FeaturedProductsGrid";
 
 // Server Component
 async function getFeaturedProducts() {
-    // Simulate API fetch
-        await new Promise(resolve => setTimeout(resolve, 600));
-        
-  // Ensure we're returning plain objects by mapping over the products
-  return products
-    .filter(product => product.featured)
-    .map(product => ({
-      ...product,
-      // Ensure all properties are serializable
-      price: Number(product.price),
-      images: [...product.images],
-      sizes: [...product.sizes],
-      colors: [...product.colors]
-    }));
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const response = await fetch(`${baseUrl}/api/products/featured`, {
+      cache: 'no-store'
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch featured products');
+    }
+
+    const result = await response.json();
+    
+    if (!result.success) {
+      throw new Error(result.error || 'Failed to fetch featured products');
+    }
+
+    return result.data;
+  } catch (error) {
+    console.error('Error fetching featured products:', error);
+    return [];
+  }
 }
 
 // Loading Skeleton Component

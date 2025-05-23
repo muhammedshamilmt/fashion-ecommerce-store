@@ -70,6 +70,32 @@ export async function GET() {
       }
     ]).toArray();
 
+    // Get monthly revenue for the last 12 months
+    const twelveMonthsAgo = new Date();
+    twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
+    
+    const monthlyRevenue = await db.collection('orders').aggregate([
+      {
+        $match: {
+          createdAt: { $gte: twelveMonthsAgo }
+        }
+      },
+      {
+        $group: {
+          _id: {
+            $dateToString: {
+              format: "%Y-%m",
+              date: "$createdAt"
+            }
+          },
+          revenue: { $sum: "$total" }
+        }
+      },
+      {
+        $sort: { _id: 1 }
+      }
+    ]).toArray();
+
     // Get latest 5 orders
     const recentOrders = await db.collection('orders')
       .find()
@@ -83,6 +109,12 @@ export async function GET() {
       sales: day.sales
     }));
 
+    // Format monthly revenue data
+    const formattedMonthlyRevenue = monthlyRevenue.map(month => ({
+      month: month._id,
+      revenue: month.revenue
+    }));
+
     return NextResponse.json({
       totalRevenue: revenueResult[0]?.totalRevenue || 0,
       totalOrders,
@@ -90,6 +122,7 @@ export async function GET() {
       pendingOrders,
       lastMonthRevenue: lastMonthRevenue[0]?.total || 0,
       dailySales: formattedDailySales,
+      monthlyRevenue: formattedMonthlyRevenue,
       recentOrders
     });
   } catch (error) {

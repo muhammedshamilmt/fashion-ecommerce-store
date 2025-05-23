@@ -31,6 +31,18 @@ const Navbar: React.FC = () => {
     setIsSearchOpen(false);
   }, [pathname]);
 
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMobileMenuOpen]);
+
   const handleSearch = (searchTerm: string) => {
     if (searchTerm.trim()) {
       router.push(`/products?search=${encodeURIComponent(searchTerm.trim())}`);
@@ -88,7 +100,7 @@ const Navbar: React.FC = () => {
               </Link>
             )}
 
-            {isAuthenticated ? (
+            {/* {isAuthenticated ? (
               <div className="relative group">
                 <Link
                   href="/profile"
@@ -126,7 +138,7 @@ const Navbar: React.FC = () => {
                 <User size={20} />
                 <span className="text-sm hidden lg:inline">Login</span>
               </Link>
-            )}
+            )} */}
 
             <Link
               href="/cart"
@@ -141,7 +153,7 @@ const Navbar: React.FC = () => {
             </Link>
           </div>
 
-          {/* Mobile Menu */}
+          {/* Mobile Menu Button and Icons */}
           <div className="flex items-center space-x-4 md:hidden">
             <button
               onClick={() => setIsSearchOpen(!isSearchOpen)}
@@ -161,9 +173,11 @@ const Navbar: React.FC = () => {
                 </span>
               )}
             </Link>
+            {/* Mobile menu toggle button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="text-fashion-primary focus:outline-none"
+              aria-label="Toggle mobile menu"
             >
               {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -182,22 +196,40 @@ const Navbar: React.FC = () => {
         )}
       </div>
 
-      {/* Mobile Drawer */}
+      {/* Mobile Drawer Overlay */}
       <div
-        className={`fixed inset-0 bg-white z-40 transform ${
-          isMobileMenuOpen ? "translate-x-0" : "translate-x-full"
-        } transition-transform duration-300 ease-in-out md:hidden pt-20 px-6`}
+        className={`fixed inset-0 bg-black/50 z-40 transition-opacity duration-300 ${isMobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}
+        onClick={() => setIsMobileMenuOpen(false)} // Close overlay on click outside
+      ></div>
+
+      {/* Mobile Drawer Content */}
+      <div
+        className={`fixed top-0 right-0 w-64 md:w-72 bg-white h-full z-50 transform ${isMobileMenuOpen ? "translate-x-0" : "translate-x-full"}
+          transition-transform duration-300 ease-in-out pt-6 pb-6 overflow-y-auto`}
       >
-        <div className="flex flex-col space-y-6">
+         {/* Drawer Header with Close Button */}
+        <div className="flex justify-between items-center px-6 pb-4 border-b border-gray-200">
+          <span className="text-lg font-bold text-fashion-primary">Menu</span>
+          <button
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="text-gray-500 hover:text-gray-700 focus:outline-none"
+            aria-label="Close mobile menu"
+          >
+            <X size={24} />
+          </button>
+        </div>
+        
+        <div className="flex flex-col space-y-6 px-6 pt-4">
           <Link href="/" className="text-lg font-medium text-fashion-primary hover:text-fashion-primary/80">Home</Link>
           <Link href="/products" className="text-lg font-medium text-fashion-primary hover:text-fashion-primary/80">Shop</Link>
 
           <div className="space-y-2">
             <p className="text-sm font-semibold text-fashion-primary/60 uppercase tracking-wider">Collections</p>
-            <Link href="/womenscollection" className="block text-lg font-medium text-fashion-primary hover:text-fashion-primary/80 pl-2">Mens Thobas</Link>
-            <Link href="/mens-collection" className="block text-lg font-medium text-fashion-primary hover:text-fashion-primary/80 pl-2">Kids Thobas</Link>
-            <Link href="/accessories-collection" className="block text-lg font-medium text-fashion-primary hover:text-fashion-primary/80 pl-2">Accessories</Link>
-            <Link href="/new-arrivals" className="block text-lg font-medium text-fashion-primary hover:text-fashion-primary/80 pl-2">New Arrivals</Link>
+            <Link href="/mens-thobas" className="block text-lg font-medium text-fashion-primary hover:text-fashion-primary/80 pl-2">Mens Thobas</Link>
+            <Link href="/kids-thobas" className="block text-lg font-medium text-fashion-primary hover:text-fashion-primary/80 pl-2">Kids Thobas</Link>
+            <Link href="/turban-caps" className="block text-lg font-medium text-fashion-primary hover:text-fashion-primary/80 pl-2">Turban & Caps</Link>
+            <Link href="/pajamas" className="block text-lg font-medium text-fashion-primary hover:text-fashion-primary/80 pl-2">Pajamas</Link>
+            <Link href="/emarathi" className="block text-lg font-medium text-fashion-primary hover:text-fashion-primary/80 pl-2">Emarathi</Link>
           </div>
 
           <Link href="/about" className="text-lg font-medium text-fashion-primary hover:text-fashion-primary/80">About</Link>

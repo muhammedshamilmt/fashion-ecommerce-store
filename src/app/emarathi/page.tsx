@@ -25,13 +25,13 @@ const LoadingSkeleton = () => {
   );
 };
 
-async function getMensThobas(): Promise<Product[]> {
+async function getEmarathi(): Promise<Product[]> {
   try {
     const { db } = await connectToDatabase();
     
     const products = await db.collection("products")
       .find({
-        category: "Mens Thobas"
+        category: "Emarathi"
       })
       .sort({ createdAt: -1 })
       .toArray();
@@ -52,13 +52,13 @@ async function getMensThobas(): Promise<Product[]> {
       updatedAt: product.updatedAt
     }));
   } catch (error) {
-    console.error("Error fetching men's thobas:", error);
+    console.error("Error fetching Emarathi products:", error);
     return [];
   }
 }
 
-const MensThobasPage = async () => {
-  const mensThobasProducts = await getMensThobas();
+const EmarathiPage = async () => {
+  const emarathiProducts = await getEmarathi();
   
   return (
     <div className="min-h-screen bg-gray-50">
@@ -74,26 +74,26 @@ const MensThobasPage = async () => {
         </div>
         
         <div className="text-center mb-10">
-          <h1 className="text-3xl font-bold text-fashion-primary mb-4">Men's Thobas Collection</h1>
+          <h1 className="text-3xl font-bold text-fashion-primary mb-4">Emarathi Collection</h1>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Discover our exclusive collection of premium men's thobas, featuring traditional designs with modern elegance.
+            Discover our exclusive collection of premium Emarathi wear, featuring traditional designs with modern elegance.
           </p>
         </div>
         
         <React.Suspense fallback={<LoadingSkeleton />}>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {mensThobasProducts.map((product, index) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {emarathiProducts.map((product, index) => (
               <ProductCard 
                 key={product._id} 
                 product={product} 
                 index={index} 
               />
-          ))}
-        </div>
+            ))}
+          </div>
         </React.Suspense>
       </div>
     </div>
   );
 };
 
-export default MensThobasPage;
+export default EmarathiPage;

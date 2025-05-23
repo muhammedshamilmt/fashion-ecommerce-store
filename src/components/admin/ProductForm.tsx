@@ -66,7 +66,7 @@ interface ProductFormProps {
 
 const availableSizes = ["XS", "S", "M", "L", "XL", "XXL", "30", "32", "34", "36", "38", "40", "42", "44"];
 const availableColors = ["Black", "White", "Red", "Blue", "Green", "Yellow", "Brown", "Gray", "Navy", "Pink", "Purple", "Orange", "Beige", "Tan", "Charcoal"];
-const availableCategories = ["Mens Thobas","Kids Thobas", "Turban & Caps", "Pajamas","Emarathi","Suadi","Omani","Morocan"];
+const availableCategories = ["Mens Thobas","Kids Thobas", "Turban & Caps", "Pajamas","Emarathi","Saudi","Omani","Morocan"];
 
 // Sample placeholder images
 const placeholderImages = [
@@ -231,38 +231,11 @@ const ProductForm: React.FC<ProductFormProps> = ({
         return;
       }
 
-      // Prepare the request body
-      const requestBody = initialData 
-        ? { ...data, _id: initialData._id }
-        : data;
-
-      // Save product data
-      const response = await fetch("/api/products", {
-        method: initialData ? "PUT" : "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(requestBody),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || "Failed to save product");
-      }
-
-      if (!result.success) {
-        throw new Error(result.error || "Failed to save product");
-      }
-
-      // Close dialog first
+      // Call parent's onSubmit with the form data
+      await onSubmit(data);
+      
+      // Close dialog
       onOpenChange(false);
-      
-      // Show success message
-      toast.success(initialData ? "Product updated successfully" : "Product added successfully");
-      
-      // Call onSubmit with the result data
-      await onSubmit(result.data);
       
       // Reset form and state after successful submission
       form.reset();
@@ -316,10 +289,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
         
         <Form {...form}>
           <form 
-            onSubmit={(e) => {
-              e.preventDefault();
-              form.handleSubmit(handleSubmit)(e);
-            }} 
+            onSubmit={form.handleSubmit(handleSubmit)} 
             className="space-y-6"
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -564,7 +534,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
                       />
                     </FormControl>
                     <div className="space-y-1 leading-none">
-                      <FormLabel>Featured Product</FormLabel>
+                      <FormLabel>Premium Products</FormLabel>
                     </div>
                   </FormItem>
                 )}

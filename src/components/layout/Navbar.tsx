@@ -257,7 +257,7 @@ const Navbar: React.FC = () => {
             </>
           ) : (
             <Link href="/login" className="text-lg font-medium text-fashion-primary hover:text-fashion-primary/80 flex items-center space-x-2">
-              <User size={20} /><span>Login / Sign Up</span>
+              <User size={20} /><span>Login</span>
             </Link>
           )}
         </div>

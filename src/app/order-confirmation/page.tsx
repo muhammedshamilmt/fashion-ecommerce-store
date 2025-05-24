@@ -51,7 +51,7 @@ const OrderConfirmation = () => {
                 <span className="font-medium text-green-600">Processing</span>
               </div>
             </div>
-
+            
             <div className="space-y-4">
               <Button
                 onClick={() => router.push('/track-order')}
@@ -66,7 +66,7 @@ const OrderConfirmation = () => {
                 variant="outline"
                 className="w-full"
               >
-                Continue Shopping
+                  Continue Shopping
               </Button>
             </div>
           </div>

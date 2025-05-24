@@ -25,6 +25,7 @@ interface Settings {
   storeAddress: string;
   contactEmail: string;
   phoneNumber: string;
+  workingHours: string;
 }
 
 const Contact = () => {
@@ -208,11 +209,11 @@ const Contact = () => {
                       </div>
                       <div>
                         <h3 className="font-medium text-lg text-gray-900">Visit Us</h3>
-                        <p className="text-gray-600 mt-1 whitespace-pre-line">
+                        <div className="text-gray-600 mt-1 whitespace-pre-line">
                           {isLoading ? (
                             <div className="h-4 bg-gray-200 rounded animate-pulse w-32"></div>
                           ) : settings?.storeAddress || "Address not available"}
-                        </p>
+                        </div>
                       </div>
                     </div>
                     
@@ -222,7 +223,7 @@ const Contact = () => {
                       </div>
                       <div>
                         <h3 className="font-medium text-lg text-gray-900">Email Us</h3>
-                        <p className="text-gray-600 mt-1">
+                        <div className="text-gray-600 mt-1">
                           {isLoading ? (
                             <div className="h-4 bg-gray-200 rounded animate-pulse w-32"></div>
                           ) : (
@@ -230,7 +231,7 @@ const Contact = () => {
                               {settings?.contactEmail || "Email not available"}
                             </a>
                           )}
-                        </p>
+                        </div>
                       </div>
                     </div>
                     
@@ -240,7 +241,7 @@ const Contact = () => {
                       </div>
                       <div>
                         <h3 className="font-medium text-lg text-gray-900">Call Us</h3>
-                        <p className="text-gray-600 mt-1">
+                        <div className="text-gray-600 mt-1">
                           {isLoading ? (
                             <div className="h-4 bg-gray-200 rounded animate-pulse w-32"></div>
                           ) : (
@@ -250,7 +251,7 @@ const Contact = () => {
                           )}
                           <br />
                           <span className="text-sm">Monday-Friday: 9AM-6PM EST</span>
-                        </p>
+                        </div>
                       </div>
                     </div>
                     
@@ -260,10 +261,10 @@ const Contact = () => {
                       </div>
                       <div>
                         <h3 className="font-medium text-lg text-gray-900">Live Chat</h3>
-                        <p className="text-gray-600 mt-1">
+                        <div className="text-gray-600 mt-1">
                           Available on our website<br />
                           <span className="text-sm">Monday-Sunday: 8AM-10PM EST</span>
-                        </p>
+                        </div>
                       </div>
                     </div>
                   </div>

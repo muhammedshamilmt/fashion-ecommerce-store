@@ -1,35 +1,38 @@
 'use client'
 
 import React, { useState } from "react";
-import { Search, Package, Truck, CheckCircle2, XCircle, Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Search, Package, Truck, CheckCircle2, XCircle, Loader2, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-interface TrackingInfo {
-  orderId: string;
+interface TrackingStatus {
+  status: 'pending' | 'processing' | 'shipped' | 'delivered';
+  location: string;
+  timestamp: string;
+}
+
+interface OrderInfo {
   orderNumber: string;
-  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
-  estimatedDelivery: string;
+  status: 'pending' | 'processing' | 'shipped' | 'delivered';
   currentLocation: string;
-  history: {
-    status: string;
-    location: string;
-    timestamp: string;
-  }[];
+  estimatedDelivery: string;
+  trackingHistory: TrackingStatus[];
 }
 
 const TrackOrder = () => {
+  const router = useRouter();
   const [orderNumber, setOrderNumber] = useState("");
+  const [orderInfo, setOrderInfo] = useState<OrderInfo | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [trackingInfo, setTrackingInfo] = useState<TrackingInfo | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!orderNumber.trim()) {
-      toast.error("Please enter your order number");
+      toast.error("Please enter an order number");
       return;
     }
 
@@ -43,14 +46,13 @@ const TrackOrder = () => {
       }
 
       if (result.success) {
-        setTrackingInfo(result.data);
+        setOrderInfo(result.data);
       } else {
-        throw new Error(result.error || "Failed to fetch order information");
+        throw new Error(result.error || "Order not found");
       }
     } catch (error) {
-      console.error("Error fetching order info:", error);
       toast.error(error instanceof Error ? error.message : "Failed to fetch order information");
-      setTrackingInfo(null);
+      setOrderInfo(null);
     } finally {
       setIsLoading(false);
     }
@@ -58,134 +60,178 @@ const TrackOrder = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'delivered':
-        return 'text-green-600';
-      case 'shipped':
-        return 'text-blue-600';
+      case 'pending':
+        return 'bg-yellow-500';
       case 'processing':
-        return 'text-yellow-600';
-      case 'cancelled':
-        return 'text-red-600';
+        return 'bg-blue-500';
+      case 'shipped':
+        return 'bg-purple-500';
+      case 'delivered':
+        return 'bg-green-500';
       default:
-        return 'text-gray-600';
+        return 'bg-gray-500';
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'delivered':
-        return <CheckCircle2 className="w-6 h-6 text-green-600" />;
-      case 'shipped':
-        return <Truck className="w-6 h-6 text-blue-600" />;
+      case 'pending':
+        return <AlertCircle className="w-5 h-5" />;
       case 'processing':
-        return <Package className="w-6 h-6 text-yellow-600" />;
-      case 'cancelled':
-        return <XCircle className="w-6 h-6 text-red-600" />;
+        return <Loader2 className="w-5 h-5 animate-spin" />;
+      case 'shipped':
+        return <Truck className="w-5 h-5" />;
+      case 'delivered':
+        return <CheckCircle2 className="w-5 h-5" />;
       default:
-        return <Package className="w-6 h-6 text-gray-600" />;
+        return <Package className="w-5 h-5" />;
     }
   };
 
-  return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
-      <Navbar />
-      <main className="flex-grow pt-20 pb-16">
-        {/* Hero Section */}
-        <section className="bg-gradient-to-b from-primary/10 to-primary/5 py-16">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto text-center">
-              <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-                Track Your Order
-              </h1>
-              <div className="w-20 h-1 bg-primary mx-auto mb-6"></div>
-              <p className="text-lg text-gray-700 mb-8 max-w-2xl mx-auto">
-                Enter your order number to get real-time updates on your order status and delivery progress.
-              </p>
-            </div>
-          </div>
-        </section>
+  const getStatusText = (status: string) => {
+    return status.charAt(0).toUpperCase() + status.slice(1);
+  };
 
-        {/* Tracking Form */}
-        <section className="py-16">
-          <div className="container mx-auto px-4">
-            <div className="max-w-2xl mx-auto">
-              <form onSubmit={handleSubmit} className="flex gap-4">
-                <div className="flex-1 relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-                  <Input
-                    type="text"
-                    value={orderNumber}
-                    onChange={(e) => setOrderNumber(e.target.value)}
-                    placeholder="Enter your order number"
-                    className="pl-10 w-full"
-                  />
-                </div>
-                <Button 
-                  type="submit" 
+  const getActiveStatusIndex = (status: string) => {
+    const statuses = ['pending', 'processing', 'shipped', 'delivered'];
+    return statuses.indexOf(status);
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col">
+      <Navbar />
+      <main className="flex-grow pt-28 pb-16 animate-fade-in">
+        <div className="container mx-auto px-4">
+          <div className="max-w-2xl mx-auto">
+            <h1 className="text-3xl font-bold text-[#2B3972] mb-2">Track Your Order</h1>
+            <p className="text-[#2B3972]/70 mb-8">
+              Enter your order number to track your package and view its current status.
+            </p>
+
+            <form onSubmit={handleSubmit} className="mb-8">
+              <div className="flex gap-4">
+                <Input
+                  type="text"
+                  placeholder="Enter your order number"
+                  value={orderNumber}
+                  onChange={(e) => setOrderNumber(e.target.value)}
+                  className="flex-1"
+                />
+                <Button
+                  type="submit"
+                  className="bg-[#2B3972] hover:bg-[#2B3972]/90"
                   disabled={isLoading}
-                  className="bg-primary hover:bg-primary/90"
                 >
                   {isLoading ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                   ) : (
-                    "Track Order"
+                    <Search className="w-4 h-4 mr-2" />
                   )}
+                  Track
                 </Button>
-              </form>
-            </div>
-          </div>
-        </section>
+              </div>
+            </form>
 
-        {/* Tracking Results */}
-        {trackingInfo && (
-          <section className="py-8">
-            <div className="container mx-auto px-4">
-              <div className="max-w-4xl mx-auto">
-                <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
-                  <div className="flex items-center justify-between mb-6">
-                    <div>
-                      <h2 className="text-2xl font-semibold text-gray-900">Order Status</h2>
-                      <p className="text-gray-600">Order Number: {trackingInfo.orderNumber}</p>
+            {orderInfo && (
+              <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
+                {/* Tracking Status Line */}
+                <div className="p-6 border-b border-gray-100">
+                  <div className="relative">
+                    <div className="flex justify-between mb-4">
+                      {['pending', 'processing', 'shipped', 'delivered'].map((status, index) => {
+                        const isActive = getActiveStatusIndex(orderInfo.status) >= index;
+                        const isCurrent = orderInfo.status === status;
+                        const isLast = status === 'delivered';
+                        return (
+                          <div key={status} className="flex flex-col items-center relative">
+                            {/* Connecting line */}
+                            {!isLast && (
+                              <div className="absolute top-5 left-[50%] w-[calc(100%+9rem)] h-0.5 bg-gray-200">
+                                <div 
+                                  className={`h-full transition-all duration-500 ${
+                                    isActive ? 'bg-green-500' : 'bg-gray-200'
+                                  }`}
+                                  style={{
+                                    width: isActive ? '100%' : '0%'
+                                  }}
+                                />
+                              </div>
+                            )}
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-2 ${
+                              isActive ? getStatusColor(status) : 'bg-gray-200'
+                            } text-white relative z-10`}>
+                              {getStatusIcon(status)}
+                            </div>
+                            <span className={`text-sm font-medium ${
+                              isActive ? 'text-gray-900' : 'text-gray-400'
+                            }`}>
+                              {getStatusText(status)}
+                            </span>
+                          </div>
+                        );
+                      })}
                     </div>
-                    <div className="flex items-center gap-2">
-                      {getStatusIcon(trackingInfo.status)}
-                      <span className={`font-medium ${getStatusColor(trackingInfo.status)}`}>
-                        {trackingInfo.status.charAt(0).toUpperCase() + trackingInfo.status.slice(1)}
+                  </div>
+                </div>
+
+                {/* Order Details */}
+                <div className="p-6">
+                  <div className="space-y-4">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Order Number:</span>
+                      <span className="font-medium text-[#2B3972]">{orderInfo.orderNumber}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Current Status:</span>
+                      <span className={`font-medium ${getStatusColor(orderInfo.status)} text-white px-3 py-1 rounded-full text-sm`}>
+                        {getStatusText(orderInfo.status)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Current Location:</span>
+                      <span className="font-medium text-[#2B3972]">{orderInfo.currentLocation}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Estimated Delivery:</span>
+                      <span className="font-medium text-[#2B3972]">
+                        {new Date(orderInfo.estimatedDelivery).toLocaleDateString()}
                       </span>
                     </div>
                   </div>
+                </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <h3 className="text-sm font-medium text-gray-500 mb-1">Estimated Delivery</h3>
-                      <p className="text-gray-900">{trackingInfo.estimatedDelivery}</p>
-                    </div>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <h3 className="text-sm font-medium text-gray-500 mb-1">Current Location</h3>
-                      <p className="text-gray-900">{trackingInfo.currentLocation}</p>
-                    </div>
-                  </div>
-
-                  <div className="border-t pt-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Order History</h3>
-                    <div className="space-y-4">
-                      {trackingInfo.history.map((item, index) => (
-                        <div key={index} className="flex items-start gap-4">
-                          <div className="w-2 h-2 mt-2 rounded-full bg-primary"></div>
+                {/* Tracking History */}
+                <div className="p-6 border-t border-gray-100">
+                  <h3 className="text-lg font-semibold text-[#2B3972] mb-4">Order History</h3>
+                  <div className="space-y-4">
+                    {orderInfo.trackingHistory && orderInfo.trackingHistory.length > 0 ? (
+                      orderInfo.trackingHistory.map((history, index) => (
+                        <div key={index} className="flex items-start space-x-4">
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                            getStatusColor(history.status)
+                          } text-white`}>
+                            {getStatusIcon(history.status)}
+                          </div>
                           <div>
-                            <p className="font-medium text-gray-900">{item.status}</p>
-                            <p className="text-sm text-gray-600">{item.location}</p>
-                            <p className="text-sm text-gray-500">{item.timestamp}</p>
+                            <p className="font-medium text-[#2B3972]">{getStatusText(history.status)}</p>
+                            <p className="text-sm text-gray-600">{history.location}</p>
+                            <p className="text-xs text-gray-500">
+                              {new Date(history.timestamp).toLocaleString()}
+                            </p>
                           </div>
                         </div>
-                      ))}
-                    </div>
+                      ))
+                    ) : (
+                      <div className="text-center py-4 text-gray-500">
+                        No tracking history available yet.
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
-            </div>
-          </section>
-        )}
+            )}
+          </div>
+        </div>
       </main>
       <Footer />
     </div>

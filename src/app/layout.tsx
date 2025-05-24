@@ -17,7 +17,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning>
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={<div>hello</div>}>
           <ImageKitProvider>
             <Providers>
               <ClientLayout>{children}</ClientLayout>

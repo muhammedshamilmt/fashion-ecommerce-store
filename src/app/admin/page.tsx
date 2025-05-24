@@ -78,7 +78,7 @@ const AdminPage = () => {
       toast.success('Logged out successfully');
       
       // Redirect to login page
-      router.replace('/login');
+      router.replace('/');
     } catch (error) {
       console.error('Logout error:', error);
       toast.error('Failed to logout. Please try again.');

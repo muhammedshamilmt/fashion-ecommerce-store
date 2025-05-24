@@ -25,28 +25,41 @@ interface AdminProfile {
 }
 
 interface Settings {
-  storeName: string;
+  _id: string;
+  siteName: string;
+  siteDescription: string;
   contactEmail: string;
-  phoneNumber: string;
-  storeAddress: string;
+  contactPhone: string;
+  address: string;
+  socialMedia: {
+    facebook: string;
+    twitter: string;
+    instagram: string;
+  };
+  adminProfile?: {
+    photoURL?: string;
+    name?: string;
+    email?: string;
+    role?: string;
+    phone?: string;
+  };
   currency: string;
-  adminProfile: AdminProfile;
 }
 
 const SettingsManagement = () => {
   const [settings, setSettings] = useState<Settings>({
-    storeName: "FashionFit",
+    _id: "",
+    siteName: "FashionFit",
+    siteDescription: "",
     contactEmail: "contact@fashionfit.com",
-    phoneNumber: "+1 (555) 123-4567",
-    storeAddress: "123 Fashion Avenue, Suite 500\nNew York, NY 10001\nUnited States",
-    currency: "usd",
-    adminProfile: {
-      fullName: "Alex Johnson",
-      email: "alex@fashionfit.com",
-      role: "Store Administrator",
-      phone: "+1 (555) 987-6543",
-      photoURL: "https://i.pravatar.cc/150?img=3"
-    }
+    contactPhone: "+1 (555) 123-4567",
+    address: "123 Fashion Avenue, Suite 500\nNew York, NY 10001\nUnited States",
+    socialMedia: {
+      facebook: "",
+      twitter: "",
+      instagram: ""
+    },
+    currency: "usd"
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -167,11 +180,11 @@ const SettingsManagement = () => {
             <CardContent className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label htmlFor="storeName">Store Name</Label>
+                  <Label htmlFor="siteName">Store Name</Label>
                   <Input 
-                    id="storeName" 
-                    name="storeName" 
-                value={settings.storeName} 
+                    id="siteName" 
+                    name="siteName" 
+                value={settings.siteName} 
                 onChange={handleStoreChange} 
                   />
                 </div>
@@ -189,11 +202,11 @@ const SettingsManagement = () => {
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label htmlFor="phoneNumber">Phone Number</Label>
+                  <Label htmlFor="contactPhone">Phone Number</Label>
                   <Input 
-                    id="phoneNumber" 
-                    name="phoneNumber" 
-                value={settings.phoneNumber} 
+                    id="contactPhone" 
+                    name="contactPhone" 
+                value={settings.contactPhone} 
                 onChange={handleStoreChange} 
                   />
                 </div>
@@ -214,12 +227,12 @@ const SettingsManagement = () => {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="storeAddress">Store Address</Label>
+                <Label htmlFor="address">Store Address</Label>
                 <Textarea 
-                  id="storeAddress" 
-                  name="storeAddress" 
+                  id="address" 
+                  name="address" 
                   rows={4} 
-              value={settings.storeAddress} 
+              value={settings.address} 
               onChange={handleStoreChange} 
                 />
               </div>
@@ -237,7 +250,7 @@ const SettingsManagement = () => {
                 <div className="flex items-center gap-4">
                   <div className="h-20 w-20 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
                     <img 
-                  src={settings.adminProfile.photoURL || "https://i.pravatar.cc/150?img=3"} 
+                  src={settings?.adminProfile?.photoURL || "https://i.pravatar.cc/150?img=3"} 
                       alt="Profile avatar" 
                       className="h-full w-full object-cover"
                     />
@@ -255,21 +268,21 @@ const SettingsManagement = () => {
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label htmlFor="fullName">Full Name</Label>
+                  <Label htmlFor="adminProfile.name">Full Name</Label>
               <Input 
-                id="fullName" 
-                name="fullName"
-                value={settings.adminProfile.fullName}
+                id="adminProfile.name" 
+                name="adminProfile.name"
+                value={settings?.adminProfile?.name}
                 onChange={handleAdminChange}
               />
                 </div>
                 <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="adminProfile.email">Email</Label>
               <Input 
-                id="email" 
-                name="email"
+                id="adminProfile.email" 
+                name="adminProfile.email"
                 type="email"
-                value={settings.adminProfile.email}
+                value={settings?.adminProfile?.email}
                 onChange={handleAdminChange}
               />
                 </div>
@@ -277,20 +290,20 @@ const SettingsManagement = () => {
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label htmlFor="role">Role</Label>
+                  <Label htmlFor="adminProfile.role">Role</Label>
                     <Input 
-                id="role" 
-                name="role"
-                value={settings.adminProfile.role}
+                id="adminProfile.role" 
+                name="adminProfile.role"
+                value={settings?.adminProfile?.role}
                 onChange={handleAdminChange}
                     />
                 </div>
                 <div className="space-y-2">
-              <Label htmlFor="phone">Phone</Label>
+              <Label htmlFor="adminProfile.phone">Phone</Label>
                     <Input 
-                id="phone" 
-                name="phone"
-                value={settings.adminProfile.phone}
+                id="adminProfile.phone" 
+                name="adminProfile.phone"
+                value={settings?.adminProfile?.phone}
                 onChange={handleAdminChange}
                   />
                 </div>

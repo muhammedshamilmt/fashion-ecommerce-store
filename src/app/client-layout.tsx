@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from "react";
+import { Loader2 } from "lucide-react";
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false);
@@ -17,7 +18,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     return (
       <div className="min-h-screen bg-gray-50">
         <div className="flex items-center justify-center h-screen">
-          <div className="animate-pulse text-gray-500">Loading...</div>
+          <Loader2 className="w-8 h-8 animate-spin text-fashion-primary" />
         </div>
       </div>
     );

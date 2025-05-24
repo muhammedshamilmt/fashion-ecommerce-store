@@ -30,12 +30,25 @@ import SettingsManagement from "@/components/admin/SettingsManagement";
 import MessageManagement from "@/components/admin/messagesmanagement";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { toast } from 'sonner';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const AdminPage = () => {
   const router = useRouter();
   const { isAuthenticated, isAdmin, logout, user } = useAuth();
   const [activeTab, setActiveTab] = useState("dashboard");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   useEffect(() => {
     if (!isAuthenticated || !isAdmin) {
@@ -53,6 +66,26 @@ const AdminPage = () => {
     { id: "messages", label: "messages", icon: MessageCircle },
     { id: "settings", label: "Settings", icon: Settings },
   ];
+
+  const handleLogout = async () => {
+    try {
+      setIsLoggingOut(true);
+      
+      // Call the logout function from AuthContext
+      await logout();
+      
+      // Show success message
+      toast.success('Logged out successfully');
+      
+      // Redirect to login page
+      router.replace('/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast.error('Failed to logout. Please try again.');
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
 
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50">
@@ -78,13 +111,35 @@ const AdminPage = () => {
           >
             <Home size={20} />
           </Link>
-          <button
-            onClick={logout}
-            className="text-fashion-primary/70 hover:text-fashion-primary"
-            aria-label="Log out"
-          >
-            <LogOut size={20} />
-          </button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                variant="outline"
+                className="flex items-center gap-2 text-red-600 hover:text-red-700 hover:bg-red-50"
+                disabled={isLoggingOut}
+              >
+                <LogOut size={20} />
+                {isLoggingOut ? 'Logging out...' : 'Logout'}
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you sure you want to logout?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  You will need to login again to access the admin dashboard.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={handleLogout}
+                  className="bg-red-600 hover:bg-red-700"
+                >
+                  Yes, logout
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </div>
 
@@ -153,7 +208,7 @@ const AdminPage = () => {
                   </Link>
                   <Separator className="my-1" />
                   <button
-                    onClick={logout}
+                    onClick={handleLogout}
                     className="block w-full text-left px-4 py-2 text-sm text-fashion-primary hover:bg-gray-100"
                   >
                     Sign Out

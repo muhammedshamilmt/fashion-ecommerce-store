@@ -87,6 +87,11 @@ const Footer = () => {
                   Shipping & Returns
                 </Link>
               </li>
+              <li>
+                <Link href="/admin" className="text-gray-300 hover:text-[#3FB185] transition-colors duration-300">
+                  Admin 
+                </Link>
+              </li>
             </ul>
           </div>
 

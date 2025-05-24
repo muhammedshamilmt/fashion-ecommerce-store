@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState, useEffect } from "react";
 import { 
   Plus, 
@@ -9,12 +11,15 @@ import {
   XCircle,
   ArrowUpDown,
   ChevronDown,
-  Loader2
+  Loader2,
+  FileText,
+  Download
 } from "lucide-react";
 import { Product } from "@/utils/data";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import ProductForm from "./ProductForm";
+import jsPDF from 'jspdf';
 
 const ProductManagement: React.FC = () => {
   const [allProducts, setAllProducts] = useState<Product[]>([]);
@@ -216,11 +221,120 @@ const ProductManagement: React.FC = () => {
     }
   };
 
+  const handleExportShippingAddresses = async () => {
+    try {
+      // Fetch orders to get shipping addresses
+      const response = await fetch('/api/orders');
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to fetch orders");
+      }
+
+      const orders = result.data;
+      const doc = new jsPDF();
+      let yPos = 20;
+      const pageHeight = doc.internal.pageSize.height;
+      const margin = 14;
+
+      // Add title
+      doc.setFontSize(20);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(74, 167, 159);
+      doc.text('Shipping Addresses Report', margin, yPos);
+      yPos += 15;
+
+      // Add generation date
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(100);
+      doc.text(`Generated on: ${new Date().toLocaleDateString()}`, margin, yPos);
+      yPos += 20;
+
+      // Process each order
+      orders.forEach((order: any, index: number) => {
+        // Check if we need a new page
+        if (yPos > pageHeight - 100) {
+          doc.addPage();
+          yPos = 20;
+        }
+
+        // Order Information Section Header
+        doc.setFontSize(14);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(74, 167, 159);
+        doc.text(`Order #${index + 1}`, margin, yPos);
+        doc.setFont('helvetica', 'normal');
+        yPos += 8;
+
+        // Customer Name
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.text('Customer Name', margin, yPos);
+        doc.setFontSize(12);
+        doc.setTextColor(0);
+        doc.text(`${order.customerInfo.firstName} ${order.customerInfo.lastName}`, margin, yPos + 5);
+        yPos += 15;
+
+        // Email
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.text('Email', margin, yPos);
+        doc.setFontSize(12);
+        doc.setTextColor(0);
+        doc.text(order.customerInfo.email, margin, yPos + 5);
+        yPos += 15;
+
+        // Phone
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.text('Phone', margin, yPos);
+        doc.setFontSize(12);
+        doc.setTextColor(0);
+        doc.text(order.customerInfo.phone, margin, yPos + 5);
+        yPos += 15;
+
+        // Address
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.text('Shipping Address', margin, yPos);
+        doc.setFontSize(12);
+        doc.setTextColor(0);
+        const fullAddress = `${order.customerInfo.address}, ${order.customerInfo.city}, ${order.customerInfo.state} ${order.customerInfo.zipCode}, ${order.customerInfo.country}`;
+        const splitAddress = doc.splitTextToSize(fullAddress, 180);
+        doc.text(splitAddress, margin, yPos + 5);
+        yPos += (splitAddress.length * 5) + 15;
+
+        // Add a separator line
+        doc.setDrawColor(200);
+        doc.line(margin, yPos, doc.internal.pageSize.width - margin, yPos);
+        yPos += 20;
+      });
+
+      // Save the PDF
+      doc.save(`shipping-addresses-${new Date().toISOString().split('T')[0]}.pdf`);
+      toast.success('Shipping addresses exported successfully');
+    } catch (error) {
+      console.error('Error exporting shipping addresses:', error);
+      toast.error('Failed to export shipping addresses');
+    }
+  };
+
   return (
     <div className="w-full space-y-6 animate-fade-in">
       {/* Header and actions */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
         <h2 className="text-2xl font-bold text-fashion-primary">Products</h2>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleExportShippingAddresses}
+            className="flex items-center space-x-2"
+          >
+            <FileText size={16} />
+            <span>Export Shipping Addresses</span>
+          </Button>
         <Button
           onClick={handleAddNewProduct}
           className="bg-[#4AA79F] hover:bg-[#4AA79F]/90 flex items-center space-x-2"
@@ -228,6 +342,7 @@ const ProductManagement: React.FC = () => {
           <Plus size={18} />
           <span>Add New Product</span>
         </Button>
+        </div>
       </div>
       
       {/* Filters and search */}

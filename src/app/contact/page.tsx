@@ -229,7 +229,7 @@ const Contact = () => {
                           ) : (
                             <a href={`mailto:${settings?.contactEmail}`} className="hover:text-primary">
                               {settings?.contactEmail || "Email not available"}
-                            </a>
+                          </a>
                           )}
                         </div>
                       </div>
@@ -247,7 +247,7 @@ const Contact = () => {
                           ) : (
                             <a href={`tel:${settings?.phoneNumber}`} className="hover:text-primary">
                               {settings?.phoneNumber || "Phone number not available"}
-                            </a>
+                          </a>
                           )}
                           <br />
                           <span className="text-sm">Monday-Friday: 9AM-6PM EST</span>

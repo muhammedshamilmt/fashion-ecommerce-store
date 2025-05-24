@@ -13,7 +13,8 @@ import {
   Eye,
   Loader2,
   Printer,
-  Download
+  Download,
+  FileText
 } from "lucide-react";
 import { toast } from "sonner";
 import OrderDetailsOverlay from "./OrderDetailsOverlay";
@@ -110,7 +111,7 @@ const OrderManagement: React.FC = () => {
   // Filter orders
   const filteredOrders = orders
     .filter(order => 
-      order._id.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      `${order.customerInfo.firstName} ${order.customerInfo.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) &&
       (statusFilter === "all" || order.status === statusFilter)
     )
     .sort((a, b) => {
@@ -252,6 +253,51 @@ const OrderManagement: React.FC = () => {
     doc.save('orders-report.pdf');
   };
 
+  const handleExportShippingAddresses = () => {
+    const doc = new jsPDF();
+    
+    // Add title
+    doc.setFontSize(20);
+    doc.text('Shipping Addresses Report', 14, 20);
+    doc.setFontSize(12);
+    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 30);
+    
+    // Create table with shipping addresses
+    autoTable(doc, {
+      startY: 40,
+      head: [['Order ID', 'Customer Name', 'Address', 'City', 'State', 'ZIP', 'Country', 'Phone', 'Email']],
+      body: filteredOrders.map(order => [
+        order._id,
+        `${order.customerInfo.firstName} ${order.customerInfo.lastName}`,
+        order.customerInfo.address,
+        order.customerInfo.city,
+        order.customerInfo.state,
+        order.customerInfo.zipCode,
+        order.customerInfo.country,
+        order.customerInfo.phone,
+        order.customerInfo.email
+      ]),
+      theme: 'grid',
+      headStyles: { fillColor: [74, 167, 159] },
+      styles: { fontSize: 8 },
+      columnStyles: {
+        0: { cellWidth: 25 },
+        1: { cellWidth: 30 },
+        2: { cellWidth: 40 },
+        3: { cellWidth: 20 },
+        4: { cellWidth: 20 },
+        5: { cellWidth: 15 },
+        6: { cellWidth: 20 },
+        7: { cellWidth: 25 },
+        8: { cellWidth: 35 }
+      }
+    });
+    
+    // Save the PDF
+    doc.save(`shipping-addresses-${new Date().toISOString().split('T')[0]}.pdf`);
+    toast.success('Shipping addresses exported successfully');
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -267,6 +313,15 @@ const OrderManagement: React.FC = () => {
         <div className="flex items-center space-x-4">
           <h2 className="text-2xl font-bold text-fashion-primary">Order Management</h2>
           <div className="flex space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleExportShippingAddresses}
+              className="flex items-center space-x-2"
+            >
+              <FileText size={16} />
+              <span>Export Shipping Addresses</span>
+            </Button>
             <Button
               variant="outline"
               size="sm"
@@ -293,7 +348,7 @@ const OrderManagement: React.FC = () => {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
             <input
               type="text"
-              placeholder="Search order ID..."
+              placeholder="Search customer name..."
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
               className="pl-9 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-fashion-primary/20 w-full"
@@ -353,10 +408,10 @@ const OrderManagement: React.FC = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {currentOrders.map((order, index) => (
+              {currentOrders.map((order) => (
                 <tr key={order._id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-fashion-primary">
-                  # Order{(currentPage - 1) * ordersPerPage + index + 1}
+                    {order.orderNumber}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-fashion-primary">
                     {order.customerInfo.firstName} {order.customerInfo.lastName}
@@ -494,10 +549,7 @@ const OrderManagement: React.FC = () => {
       {/* Order Details Overlay */}
       {selectedOrder && (
         <OrderDetailsOverlay
-          order={{
-            ...selectedOrder,
-            orderNumber: filteredOrders.findIndex(order => order._id === selectedOrder._id) + 1
-          }}
+          order={selectedOrder}
           onClose={() => setSelectedOrder(null)}
         />
       )}

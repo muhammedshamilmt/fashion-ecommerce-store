@@ -14,9 +14,9 @@ const Checkout = () => {
   const { items, subtotal } = useCart();
   
   useEffect(() => {
-    // Redirect to cart if it's empty
-    if (items.length === 0) {
-      router.push('/cart');
+  // Redirect to cart if it's empty
+  if (items.length === 0) {
+    router.push('/cart');
     }
   }, [items.length, router]);
 

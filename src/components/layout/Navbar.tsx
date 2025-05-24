@@ -95,52 +95,6 @@ const Navbar: React.FC = () => {
               </button>
             )}
 
-            {isAdmin && (
-              <Link href="/admin" className="text-fashion-primary/80 hover:text-fashion-primary transition-colors">
-                <span>Admin</span>
-              </Link>
-            )}
-
-            {/* {isAuthenticated ? (
-              <div className="relative group">
-                <Link
-                  href="/profile"
-                  className="flex items-center space-x-1 text-fashion-primary/80 hover:text-fashion-primary transition-colors"
-                >
-                  <User size={20} />
-                  <span className="text-sm hidden lg:inline">{user?.name}</span>
-                </Link>
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
-                  <Link
-                    href="/profile"
-                    className="block px-4 py-2 text-sm text-fashion-primary hover:bg-fashion-light"
-                  >
-                    My Profile
-                  </Link>
-                  <Link
-                    href="/orders"
-                    className="block px-4 py-2 text-sm text-fashion-primary hover:bg-fashion-light"
-                  >
-                    My Orders
-                  </Link>
-                  <button
-                    onClick={logout}
-                    className="block w-full text-left px-4 py-2 text-sm text-fashion-primary hover:bg-fashion-light"
-                  >
-                    Logout
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <Link
-                href="/login"
-                className="flex items-center space-x-1 text-fashion-primary/80 hover:text-fashion-primary transition-colors"
-              >
-                <User size={20} />
-                <span className="text-sm hidden lg:inline">Login</span>
-              </Link>
-            )} */}
-
             <Link
               href="/cart"
               className="relative text-fashion-primary/80 hover:text-fashion-primary transition-colors"
@@ -238,10 +192,6 @@ const Navbar: React.FC = () => {
           <Link href="/contact" className="text-lg font-medium text-fashion-primary hover:text-fashion-primary/80">Contact</Link>
 
           <div className="border-t border-gray-200 my-4"></div>
-
-          {isAdmin && (
-            <Link href="/admin" className="text-lg font-medium text-fashion-primary hover:text-fashion-primary/80">Admin Dashboard</Link>
-          )}
 
           {isAuthenticated ? (
             <>

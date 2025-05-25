@@ -6,8 +6,8 @@ import { ImageKitProvider } from "@/components/providers/ImageKitProvider";
 import { Suspense } from 'react';
 
 export const metadata: Metadata = {
-  title: 'fashion store', // Your website title
-  description: 'fashion store', // Your website description
+  title: 'AL-HAYBA', // Your website title
+  description: '🤍 Elevate.Shine.Own White Fashion.', // Your website description
   icons: {
     icon: '/favicon.ico',
   },

@@ -223,7 +223,7 @@ const AdminPage = () => {
       {/* Main Content */}
       <main className="relative flex-1 overflow-y-auto flex flex-col w-full">
         {/* Desktop Header */}
-        <div className="sticky top-0 z-40 bg-white border-b border-gray-200 p-4 hidden lg:flex items-center justify-between">
+        <div className="sticky top-0 z-40 bg-white border-b border-gray-200 p-6 hidden lg:flex items-center justify-between">
           <h1 className="text-xl font-bold text-fashion-primary">
             {activeTab === "dashboard" && "Dashboard"}
             {activeTab === "products" && "Products Management"}

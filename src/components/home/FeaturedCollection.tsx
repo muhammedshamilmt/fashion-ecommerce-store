@@ -54,10 +54,10 @@ const FeaturedCollection = async () => {
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12">
           <div className="max-w-lg">
-            <span className="inline-block px-4 py-1 bg-fashion-peach text-fashion-primary text-sm font-medium rounded-full mb-4">
+            <span className="inline-block px-4 py-1 bg-fashion-peach font-['Adelone-Serial-Extrabold-Regular'] text-fashion-primary text-sm font-medium rounded-full mb-4">
               Featured Collection
             </span>
-            <h2 className="text-3xl md:text-4xl font-bold text-fashion-primary mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold font-['Adelone-Serial-Extrabold-Regular'] text-fashion-primary mb-4">
               Our Premium Selection
             </h2>
             <p className="text-fashion-primary/70">

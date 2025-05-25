@@ -18,7 +18,7 @@ const Index = () => {
           <div className="container px-4 mx-auto">
             <div className="text-center mb-10 max-w-xl mx-auto">
               <span className="badge-fashion">Popular Now</span>
-              <h2 className="text-[3rem] font-bold mt-2">Trending Styles</h2>
+              <h2 className="text-[3rem] font-['Adelone-Serial-Extrabold-Regular'] text-fashion-primary font-bold mt-2">Trending Styles</h2>
               <p className="text-fashion-600 mt-4">
                 Discover what's popular right now based on real-time data and customer favorites.
               </p>
@@ -57,9 +57,9 @@ const Index = () => {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
                   </div>
                   <div className="absolute bottom-0 left-0 right-0 p-6">
-                    <h3 className="text-[2rem] font-semibold text-white ">{item.title}</h3>
+                    <h3 className="text-[3rem] font-semibold text-white font-['Adelone-Serial-Extrabold-Regular'] ">{item.title}</h3>
                     <div className="transform translate-y-6 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
-                      <Button variant="outline" className="bg-white/90 backdrop-blur-sm text-fashion-950 hover:bg-white border-0" asChild>
+                      <Button variant="outline" className="bg-white/90 backdrop-blur-sm text-fashion-950 font-['Adelone-Serial-Extrabold-Regular'] hover:bg-white border-0" asChild>
                         <Link href={item.link}>
                           Explore Collection
                         </Link>
@@ -135,7 +135,7 @@ const Index = () => {
         <section className="py-20 bg-gradient-to-br from-fashion-primary to-fashion-primary/80 text-white">
           <div className="container mx-auto px-4">
             <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">What Our Customers Say</h2>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4 font-['Adelone-Serial-Extrabold-Regular']">What Our Customers Say</h2>
               <p className="max-w-2xl mx-auto text-white/80 text-lg">
                 Discover why thousands of fashion-forward customers choose FashionFit for their online shopping needs.
               </p>
@@ -220,14 +220,14 @@ const Index = () => {
             <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
               <div className="flex flex-col md:flex-row">
                 <div className="md:w-1/2 p-12 flex flex-col justify-center">
-                  <h2 className="text-3xl md:text-4xl font-bold text-fashion-primary mb-6">
+                  <h2 className="text-3xl md:text-4xl font-bold font-['Adelone-Serial-Extrabold-Regular'] text-fashion-primary mb-6">
                     Experience the Future of Fashion Shopping
                   </h2>
                   <p className="text-fashion-primary/70 mb-8 text-lg">
                     Sign up today and get 15% off your first purchase. Join thousands of satisfied customers who've revolutionized their shopping experience.
                   </p>
                   <div className="flex flex-col sm:flex-row gap-4">
-                    <a href="/signup" className="btn-primary text-center">
+                    <a href="/signup" className="btn-primary text-center ">
                       Create an Account
                     </a>
                     <a href="/products" className="btn-secondary text-center">

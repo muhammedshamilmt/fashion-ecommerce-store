@@ -252,7 +252,7 @@ const Products = () => {
         <div className="container mx-auto px-4">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-fashion-primary mb-2">Shop Our Collection</h1>
+            <h1 className="text-4xl font-bold text-fashion-primary mb-2 font-['Adelone-Serial-Extrabold-Regular']">Shop Our Collection</h1>
             <p className="text-fashion-primary/70">
               Discover our curated selection of high-quality fashion items.
             </p>

@@ -58,12 +58,12 @@ const Navbar: React.FC = () => {
           : "bg-transparent py-5"
       }`}
     >
-      <div className="container mx-auto px-4 md:px-8">
+      <div className="container mx-auto px-4 z-10 md:px-8">
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center">
-            <span className="text-2xl font-bold text-fashion-primary tracking-tight">
-              FashionFit
+            <span className="text-2xl font-['Adelone-Serial-Extrabold-Regular'] text-fashion-primary tracking-tight">
+              AL-HAYBA
             </span>
           </Link>
 
@@ -109,7 +109,7 @@ const Navbar: React.FC = () => {
           </div>
 
           {/* Mobile Menu Button and Icons */}
-          <div className="flex items-center space-x-4 md:hidden">
+          <div className="flex items-center space-x-4 z-50 md:hidden">
             <button
               onClick={() => setIsSearchOpen(!isSearchOpen)}
               className="text-fashion-primary/80 hover:text-fashion-primary transition-colors"
@@ -162,7 +162,7 @@ const Navbar: React.FC = () => {
         className={`fixed top-0 right-0 w-64 md:w-72 bg-white h-full z-50 transform ${isMobileMenuOpen ? "translate-x-0" : "translate-x-full"}
           transition-transform duration-300 ease-in-out pt-6 pb-6 overflow-y-auto`}
       >
-         {/* Drawer Header with Close Button */}
+        {/* Drawer Header with Close Button */}
         <div className="flex justify-between items-center px-6 pb-4 border-b border-gray-200">
           <span className="text-lg font-bold text-fashion-primary">Menu</span>
           <button

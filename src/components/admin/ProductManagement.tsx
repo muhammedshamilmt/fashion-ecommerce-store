@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { 
   Plus, 
   Search, 
@@ -13,7 +13,8 @@ import {
   ChevronDown,
   Loader2,
   FileText,
-  Download
+  Download,
+  X
 } from "lucide-react";
 import { Product } from "@/utils/data";
 import { toast } from "sonner";
@@ -24,6 +25,7 @@ import jsPDF from 'jspdf';
 const ProductManagement: React.FC = () => {
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [sortField, setSortField] = useState<string>("createdAt");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
@@ -32,6 +34,45 @@ const ProductManagement: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [categories, setCategories] = useState<string[]>(["all"]);
   
+  // Debounce search term
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 300); // 300ms delay
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  // Search function
+  const searchProducts = useCallback((products: Product[], term: string) => {
+    if (!term.trim()) return products;
+
+    const searchTermLower = term.toLowerCase().trim();
+    
+    return products.filter(product => {
+      // Search in multiple fields
+      const searchableFields = [
+        product.name,
+        product.description,
+        product.category,
+        product.sku,
+        product.colors?.join(" "),
+        product.sizes?.join(" "),
+        product.material,
+        product.brand
+      ].filter(Boolean); // Remove undefined/null values
+
+      return searchableFields.some(field => 
+        field.toLowerCase().includes(searchTermLower)
+      );
+    });
+  }, []);
+
+  // Filter products based on search term
+  const filteredProducts = React.useMemo(() => {
+    return searchProducts(allProducts, debouncedSearchTerm);
+  }, [allProducts, debouncedSearchTerm, searchProducts]);
+
   // Fetch products
   const fetchProducts = async () => {
     try {
@@ -351,11 +392,19 @@ const ProductManagement: React.FC = () => {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
           <input
             type="text"
-            placeholder="Search products..."
+            placeholder="Search by name, description, category, SKU, color, size..."
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
             className="input-field pl-10 w-full rounded-md border px-3 py-2"
           />
+          {searchTerm && (
+            <button
+              onClick={() => setSearchTerm("")}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            >
+              <X size={18} />
+            </button>
+          )}
         </div>
         
         <div className="relative">
@@ -438,7 +487,7 @@ const ProductManagement: React.FC = () => {
                     </div>
                   </td>
                 </tr>
-              ) : allProducts.length === 0 ? (
+              ) : filteredProducts.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-6 py-12 text-center text-fashion-primary/60">
                     <div className="flex flex-col items-center">
@@ -456,7 +505,7 @@ const ProductManagement: React.FC = () => {
                   </td>
                 </tr>
               ) : (
-                allProducts.map((product) => (
+                filteredProducts.map((product) => (
                   <tr key={product._id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">

@@ -43,7 +43,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Company Info */}
           <div className="space-y-4">
-            <h3 className="text-xl font-semibold">FashionFit</h3>
+            <h3 className="text-2xl font-['Adelone-Serial-Extrabold-Regular'] text-white tracking-tight">AL-HAYBA</h3>
             <p className="text-gray-300">
               Your one-stop destination for trendy and affordable fashion.
             </p>
@@ -80,11 +80,6 @@ const Footer = () => {
               <li>
                 <Link href="/faq" className="text-gray-300 hover:text-[#3FB185] transition-colors duration-300">
                   FAQ
-                </Link>
-              </li>
-              <li>
-                <Link href="/shipping" className="text-gray-300 hover:text-[#3FB185] transition-colors duration-300">
-                  Shipping & Returns
                 </Link>
               </li>
               <li>
@@ -127,8 +122,9 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="border-t border-white/10 mt-12 pt-8 text-center text-gray-300">
-          <p>&copy; {new Date().getFullYear()} FashionFit. All rights reserved.</p>
+        <div className="border-t border-white/10 mt-12 pt-8 text-center flex justify-center text-gray-300">
+          <p className=" font-['Adelone-Serial-Extrabold-Regular'] text-white ">&copy; {new Date().getFullYear()} AL-HYABA. </p>
+          <p>All rights reserved.</p>
         </div>
       </div>
     </footer>

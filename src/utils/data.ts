@@ -9,8 +9,12 @@ export interface Product {
   colors: string[];
   inStock: boolean;
   featured: boolean;
-  createdAt?: Date;
-  updatedAt?: Date;
+  createdAt: string;
+  updatedAt: string;
+  stock: number;
+  sku: string;
+  material: string;
+  brand: string;
 }
 
 export interface User {
@@ -60,7 +64,13 @@ export const products: Product[] = [
     sizes: ['S', 'M', 'L', 'XL'],
     colors: ['Black', 'White', 'Navy'],
     inStock: true,
-    featured: true
+    featured: true,
+    createdAt: '2023-01-01',
+    updatedAt: '2023-01-01',
+    stock: 10,
+    sku: 'TSH001',
+    material: 'Organic Cotton',
+    brand: 'Designer Apparel'
   },
   {
     _id: '2',
@@ -75,21 +85,31 @@ export const products: Product[] = [
     sizes: ['S', 'M', 'L'],
     colors: ['Beige', 'Gray', 'Black'],
     inStock: true,
-    featured: true
+    featured: true,
+    createdAt: '2023-02-01',
+    updatedAt: '2023-02-01',
+    stock: 5,
+    sku: 'CSW001',
+    material: 'Cashmere',
+    brand: 'Luxury Apparel'
   },
   {
     _id: '3',
-    name: 'Premium Denim Jeans',
-    description: 'High-quality denim jeans with perfect fit technology for all-day comfort.',
+    name: 'Designer Jeans',
+    description: 'Premium denim jeans with modern fit',
     price: 89.99 * 83,
-    images: [
-      'https://images.unsplash.com/photo-1582552938357-32b906df40cb?q=80&w=2940&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1582552938357-32b906df40cb?q=80&w=2940&auto=format&fit=crop',
-    ],
-    category: 'men',
+    images: ["/images/products/jeans-1.jpg", "/images/products/jeans-2.jpg"],
+    category: 'Jeans',
     sizes: ['30', '32', '34', '36'],
     colors: ['Blue', 'Black', 'Gray'],
-    inStock: true
+    inStock: true,
+    featured: false,
+    createdAt: '2023-03-01',
+    updatedAt: '2023-03-01',
+    stock: 8,
+    sku: 'DJ001',
+    material: 'Denim',
+    brand: 'Premium Apparel'
   },
   {
     _id: '4',
@@ -104,21 +124,31 @@ export const products: Product[] = [
     sizes: ['XS', 'S', 'M', 'L'],
     colors: ['White', 'Black', 'Pink'],
     inStock: true,
-    featured: true
+    featured: true,
+    createdAt: '2023-04-01',
+    updatedAt: '2023-04-01',
+    stock: 3,
+    sku: 'BS001',
+    material: 'Silk',
+    brand: 'Designer Apparel'
   },
   {
     _id: '5',
-    name: 'Tailored Wool Blazer',
-    description: 'Expertly tailored wool blazer for a refined and professional appearance.',
-    price: 199.99 * 83,
-    images: [
-      'https://images.unsplash.com/photo-1593030761757-71fae45fa0e7?q=80&w=2980&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1593030761757-71fae45fa0e7?q=80&w=2980&auto=format&fit=crop',
-    ],
-    category: 'men',
+    name: 'Business Suit',
+    description: 'Classic business suit for formal occasions',
+    price: 299.99 * 83,
+    images: ["/images/products/suit-1.jpg", "/images/products/suit-2.jpg"],
+    category: 'Suits',
     sizes: ['38', '40', '42', '44'],
     colors: ['Navy', 'Charcoal', 'Black'],
-    inStock: true
+    inStock: true,
+    featured: false,
+    createdAt: '2023-05-01',
+    updatedAt: '2023-05-01',
+    stock: 2,
+    sku: 'WB001',
+    material: 'Wool',
+    brand: 'Tailored Apparel'
   },
   {
     _id: '6',
@@ -133,7 +163,13 @@ export const products: Product[] = [
     sizes: ['36', '37', '38', '39', '40'],
     colors: ['Black', 'Brown', 'Tan'],
     inStock: true,
-    featured: true
+    featured: true,
+    createdAt: '2023-06-01',
+    updatedAt: '2023-06-01',
+    stock: 7,
+    sku: 'LB001',
+    material: 'Leather',
+    brand: 'Premium Footwear'
   }
 ];
 

@@ -298,6 +298,90 @@ const OrderManagement: React.FC = () => {
     toast.success('Shipping addresses exported successfully');
   };
 
+  const handleExportPDF = async () => {
+    try {
+      const doc = new jsPDF();
+      let yPos = 20;
+      const pageHeight = doc.internal.pageSize.height;
+      const margin = 14;
+      const ordersPerPage = 3;
+
+      // Add generation date
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(100);
+      doc.text(`Generated on: ${new Date().toLocaleDateString()}`, margin, yPos);
+      yPos += 20;
+
+      // Process each order
+      filteredOrders.forEach((order, index) => {
+        // Check if we need a new page
+        if (index > 0 && index % ordersPerPage === 0) {
+          doc.addPage();
+          yPos = 20;
+        }
+
+        // Order Information Section Header
+        doc.setFontSize(14);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(74, 167, 159);
+        doc.text(`Order #${order.orderNumber || index + 1}`, margin, yPos);
+        doc.setFont('helvetica', 'normal');
+        yPos += 8;
+
+        // Customer Name
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.text('Customer Name', margin, yPos);
+        doc.setFontSize(12);
+        doc.setTextColor(0);
+        doc.text(`${order.customerInfo.firstName} ${order.customerInfo.lastName}`, margin, yPos + 5);
+        yPos += 15;
+
+        // Email
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.text('Email', margin, yPos);
+        doc.setFontSize(12);
+        doc.setTextColor(0);
+        doc.text(order.customerInfo.email, margin, yPos + 5);
+        yPos += 15;
+
+        // Phone
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.text('Phone', margin, yPos);
+        doc.setFontSize(12);
+        doc.setTextColor(0);
+        doc.text(order.customerInfo.phone, margin, yPos + 5);
+        yPos += 15;
+
+        // Address
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.text('Shipping Address', margin, yPos);
+        doc.setFontSize(12);
+        doc.setTextColor(0);
+        const fullAddress = `${order.customerInfo.address}, ${order.customerInfo.city}, ${order.customerInfo.state} ${order.customerInfo.zipCode}, ${order.customerInfo.country}`;
+        const splitAddress = doc.splitTextToSize(fullAddress, 180);
+        doc.text(splitAddress, margin, yPos + 5);
+        yPos += (splitAddress.length * 5) + 15;
+
+        // Add a separator line
+        doc.setDrawColor(200);
+        doc.line(margin, yPos, doc.internal.pageSize.width - margin, yPos);
+        yPos += 20;
+      });
+
+      // Save the PDF
+      doc.save(`shipping-addresses-${new Date().toISOString().split('T')[0]}.pdf`);
+      toast.success('Shipping addresses exported successfully');
+    } catch (error) {
+      console.error('Error exporting shipping addresses:', error);
+      toast.error('Failed to export shipping addresses');
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -325,19 +409,10 @@ const OrderManagement: React.FC = () => {
             <Button
               variant="outline"
               size="sm"
-              onClick={handlePrintAll}
+              onClick={handleExportPDF}
               className="flex items-center space-x-2"
             >
-              <Printer size={16} />
-              <span>Print All</span>
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleExportAll}
-              className="flex items-center space-x-2"
-            >
-              <Download size={16} />
+              <FileText size={16} />
               <span>Export PDF</span>
             </Button>
           </div>
@@ -383,7 +458,7 @@ const OrderManagement: React.FC = () => {
       
       {/* Orders Table */}
       <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
-        <div className="overflow-x-auto">
+        <div className="overflow-x-scroll">
           <table className="w-full min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>

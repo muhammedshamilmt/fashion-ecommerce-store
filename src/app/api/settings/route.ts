@@ -6,10 +6,10 @@ export async function GET() {
   try {
     const { db } = await connectToDatabase();
     const settings = await db.collection('settings').findOne({});
-    
-    return NextResponse.json({ 
-      success: true, 
-      data: settings 
+
+    return NextResponse.json({
+      success: true,
+      data: settings
     });
   } catch (error) {
     console.error('Error fetching settings:', error);
@@ -58,10 +58,10 @@ export async function PUT(request: Request) {
     // Fetch the updated settings
     const updatedSettings = await db.collection('settings').findOne(
       { _id: result.upsertedId || new ObjectId(data._id) }
-    );
+      );
 
-    return NextResponse.json({ 
-      success: true, 
+    return NextResponse.json({
+      success: true,
       data: updatedSettings 
     });
   } catch (error) {

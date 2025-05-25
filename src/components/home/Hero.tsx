@@ -35,7 +35,7 @@ const Hero = () => {
               Revolutionizing Fashion Shopping
             </p>
           </div> */}
-          <h1 className="text-4xl md:text-6xl text-[3rem] font-bold  mb-6 pt-20 animate-fade-in animate-duration-700 leading-none animate-fade-in">
+          <h1 className=" text-[5rem] font-['Adelone-Serial-Extrabold-Regular'] text-fashion-primary tracking-tight  mb-6 pt-20 animate-fade-in animate-duration-700 leading-none ">
             Elevate Your Fashion Experience
           </h1>
           <p className="text-lg text-muted-foreground max-w-xl mx-auto lg:mx-0 mb-8 animate-fade-in">

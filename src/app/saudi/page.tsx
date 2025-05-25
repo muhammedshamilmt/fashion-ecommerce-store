@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import ProductCard from "@/components/products/ProductCard";
 import { connectToDatabase } from "@/lib/mongodb";
 import { Product } from "@/utils/data";
+import Footer from "@/components/layout/Footer";
 
 async function getSaudiProducts(): Promise<Product[]> {
   try {
@@ -30,7 +31,11 @@ async function getSaudiProducts(): Promise<Product[]> {
       inStock: product.inStock,
       featured: product.featured,
       createdAt: product.createdAt,
-      updatedAt: product.updatedAt
+      updatedAt: product.updatedAt,
+      stock: product.stock || 0,
+      sku: product.sku || '',
+      material: product.material || '',
+      brand: product.brand || ''
     }));
   } catch (error) {
     console.error("Error fetching Saudi products:", error);
@@ -54,7 +59,7 @@ const SaudiCollection = async () => {
         </div>
         
         <div className="text-center mb-10">
-          <h1 className="text-3xl font-bold text-fashion-primary mb-4">Saudi Collection</h1>
+          <h1 className="text-4xl font-bold text-fashion-primary mb-4 font-['Adelone-Serial-Extrabold-Regular']">Saudi Collection</h1>
           <p className="text-muted-foreground max-w-2xl mx-auto">
             Discover our premium selection of Saudi thobas, crafted with traditional elegance and modern comfort.
           </p>
@@ -66,6 +71,7 @@ const SaudiCollection = async () => {
           ))}
         </div>
       </div>
+      <Footer/>
     </div>
   );
 };

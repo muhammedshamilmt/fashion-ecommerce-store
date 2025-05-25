@@ -7,6 +7,7 @@ import Navbar from "@/components/layout/Navbar";
 import { connectToDatabase } from "@/lib/mongodb";
 import { Product } from "@/utils/data";
 import { WithId, Document } from "mongodb";
+import Footer from "@/components/layout/Footer";
 
 // Loading Skeleton Component
 const LoadingSkeleton = () => {
@@ -49,7 +50,11 @@ async function getKidsThobas(): Promise<Product[]> {
       inStock: product.inStock,
       featured: product.featured,
       createdAt: product.createdAt,
-      updatedAt: product.updatedAt
+      updatedAt: product.updatedAt,
+      stock: product.stock || 0,
+      sku: product.sku || '',
+      material: product.material || '',
+      brand: product.brand || ''
     }));
   } catch (error) {
     console.error("Error fetching kids' thobas:", error);
@@ -74,7 +79,7 @@ const KidsThobasPage = async () => {
         </div>
         
         <div className="text-center mb-10">
-          <h1 className="text-3xl font-bold text-fashion-primary mb-4">Kids' Thobas Collection</h1>
+          <h1 className="text-4xl font-bold text-fashion-primary mb-4 font-['Adelone-Serial-Extrabold-Regular']">Kids' Thobas Collection</h1>
           <p className="text-muted-foreground max-w-2xl mx-auto">
             Discover our exclusive collection of premium kids' thobas, featuring traditional designs with modern elegance.
           </p>
@@ -92,6 +97,7 @@ const KidsThobasPage = async () => {
           </div>
         </React.Suspense>
       </div>
+      <Footer/>
     </div>
   );
 };

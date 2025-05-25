@@ -25,7 +25,8 @@ import {
   ShoppingBag,
   TrendingUp,
   Calendar,
-  Clock
+  Clock,
+  Loader2
 } from "lucide-react";
 import { salesData, categoryData, orders } from "@/utils/data";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -63,6 +64,16 @@ interface Stats {
   recentOrders: Order[];
 }
 
+interface OrderStats {
+  total: number;
+  byStatus: {
+    pending: number;
+    processing: number;
+    shipped: number;
+    delivered: number;
+  };
+}
+
 const formatDate = (date: Date): string => {
   return date.toLocaleString('en-GB', {
     day: '2-digit',
@@ -95,6 +106,8 @@ const Dashboard: React.FC = () => {
     monthlyRevenue: [],
     recentOrders: []
   });
+  const [orderStats, setOrderStats] = useState<OrderStats | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -110,7 +123,30 @@ const Dashboard: React.FC = () => {
     fetchStats();
     setLastUpdated(formatDate(new Date()));
   }, []);
-  
+
+  useEffect(() => {
+    fetchOrderStats();
+  }, []);
+
+  const fetchOrderStats = async () => {
+    try {
+      const response = await fetch('/api/orders/stats');
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to fetch order statistics");
+      }
+
+      if (result.success) {
+        setOrderStats(result.data);
+      }
+    } catch (error) {
+      console.error("Error fetching order statistics:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // Calculate revenue growth
   const revenueGrowth = stats.lastMonthRevenue > 0 
     ? ((stats.totalRevenue - stats.lastMonthRevenue) / stats.lastMonthRevenue) * 100 
@@ -122,13 +158,13 @@ const Dashboard: React.FC = () => {
   // Revenue trend data (last 7 days)
   const last7DaysData = salesData.slice(-7);
   
-  // Order status data
-  const orderStatusData = [
-    { name: 'Delivered', value: stats.recentOrders.filter((order: Order) => order.status === 'delivered').length },
-    { name: 'Shipped', value: stats.recentOrders.filter((order: Order) => order.status === 'shipped').length },
-    { name: 'Processing', value: stats.recentOrders.filter((order: Order) => order.status === 'processing').length },
-    { name: 'Pending', value: stats.recentOrders.filter((order: Order) => order.status === 'pending').length },
-  ];
+  // Transform order stats for the pie chart
+  const orderStatusData = orderStats ? [
+    { name: 'Pending', value: orderStats.byStatus.pending },
+    { name: 'Processing', value: orderStats.byStatus.processing },
+    { name: 'Shipped', value: orderStats.byStatus.shipped },
+    { name: 'Delivered', value: orderStats.byStatus.delivered }
+  ] : [];
 
   // Format date for display
   const formatChartDate = (dateStr: string): string => {
@@ -324,32 +360,42 @@ const Dashboard: React.FC = () => {
             <CardDescription>Current status of all orders</CardDescription>
           </CardHeader>
           <CardContent className="h-80 pt-6">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={orderStatusData}
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={80}
-                  dataKey="value"
-                  label={({ name, value }) => `${name}: ${value}`}
-                >
-                  {orderStatusData.map((entry, index) => (
-                    <Cell key={`status-cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip 
-                  formatter={(value, name) => [`${value} orders`, name]}
-                  contentStyle={{
-                    backgroundColor: 'white',
-                    borderRadius: '8px',
-                    boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
-                    border: 'none'
-                  }}
-                />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
+            {isLoading ? (
+              <div className="flex justify-center items-center h-full">
+                <Loader2 className="w-8 h-8 animate-spin text-[#4AA79F]" />
+              </div>
+            ) : orderStats ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={orderStatusData}
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={80}
+                    dataKey="value"
+                    label={({ name, value }) => `${name}: ${value}`}
+                  >
+                    {orderStatusData.map((entry, index) => (
+                      <Cell key={`status-cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip 
+                    formatter={(value, name) => [`${value} orders`, name]}
+                    contentStyle={{
+                      backgroundColor: 'white',
+                      borderRadius: '8px',
+                      boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
+                      border: 'none'
+                    }}
+                  />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex justify-center items-center h-full text-gray-500">
+                No order data available
+              </div>
+            )}
           </CardContent>
         </Card>
         

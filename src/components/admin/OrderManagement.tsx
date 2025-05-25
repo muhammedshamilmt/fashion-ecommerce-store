@@ -462,6 +462,9 @@ const OrderManagement: React.FC = () => {
           <table className="w-full min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
+                <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-fashion-primary/60 uppercase tracking-wider">
+                  No
+                </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-fashion-primary/60 uppercase tracking-wider">
                   Order ID
                 </th>
@@ -483,8 +486,11 @@ const OrderManagement: React.FC = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {currentOrders.map((order) => (
+              {currentOrders.map((order, index) => (
                 <tr key={order._id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-fashion-primary/70">
+                    {indexOfFirstOrder + index + 1}
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-fashion-primary">
                     {order.orderNumber}
                   </td>
@@ -554,7 +560,7 @@ const OrderManagement: React.FC = () => {
               
               {filteredOrders.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-fashion-primary/60">
+                  <td colSpan={7} className="px-6 py-12 text-center text-fashion-primary/60">
                     <div className="flex flex-col items-center">
                       <Search size={36} className="mb-2 opacity-20" />
                       <p>No orders found matching your search criteria.</p>

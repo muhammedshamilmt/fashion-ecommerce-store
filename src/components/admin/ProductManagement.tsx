@@ -14,7 +14,9 @@ import {
   Loader2,
   FileText,
   Download,
-  X
+  X,
+  Eye,
+  Pencil
 } from "lucide-react";
 import { Product } from "@/utils/data";
 import { toast } from "sonner";
@@ -454,10 +456,13 @@ const ProductManagement: React.FC = () => {
       
       {/* Products Table */}
       <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
-        <div className="overflow-x-auto">
+        <div className="overflow-x-scroll">
           <table className="w-full min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
+                <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-fashion-primary/60 uppercase tracking-wider">
+                  No
+                </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-fashion-primary/60 uppercase tracking-wider">
                   Product
                 </th>
@@ -468,10 +473,10 @@ const ProductManagement: React.FC = () => {
                   Price
                 </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-fashion-primary/60 uppercase tracking-wider">
-                  Status
+                  Stock
                 </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-fashion-primary/60 uppercase tracking-wider">
-                  Featured
+                  Status
                 </th>
                 <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-fashion-primary/60 uppercase tracking-wider">
                   Actions
@@ -481,7 +486,7 @@ const ProductManagement: React.FC = () => {
             <tbody className="bg-white divide-y divide-gray-200">
               {isLoading ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center">
+                  <td colSpan={7} className="px-6 py-12 text-center">
                     <div className="flex justify-center items-center">
                       <Loader2 className="w-8 h-8 animate-spin text-[#4AA79F]" />
                     </div>
@@ -489,7 +494,7 @@ const ProductManagement: React.FC = () => {
                 </tr>
               ) : filteredProducts.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-fashion-primary/60">
+                  <td colSpan={7} className="px-6 py-12 text-center text-fashion-primary/60">
                     <div className="flex flex-col items-center">
                       <Search size={36} className="mb-2 opacity-20" />
                       <p>No products found matching your search criteria.</p>
@@ -505,83 +510,86 @@ const ProductManagement: React.FC = () => {
                   </td>
                 </tr>
               ) : (
-                filteredProducts.map((product) => (
+                filteredProducts.map((product, index) => (
                   <tr key={product._id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="h-10 w-10 flex-shrink-0 rounded overflow-hidden bg-gray-100">
-                        <img
-                          src={product.images[0]}
-                          alt={product.name}
-                          className="h-10 w-10 object-cover"
-                        />
-                      </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-fashion-primary">{product.name}</div>
+                    <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-fashion-primary/70">
+                      {index + 1}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <div className="h-10 w-10 flex-shrink-0 rounded overflow-hidden bg-gray-100">
+                          <img
+                            src={product.images[0]}
+                            alt={product.name}
+                            className="h-10 w-10 object-cover"
+                          />
+                        </div>
+                        <div className="ml-4">
+                          <div className="text-sm font-medium text-fashion-primary">{product.name}</div>
                           <div className="text-sm text-fashion-primary/60">ID: {product._id}</div>
+                        </div>
                       </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-fashion-primary">
-                      <Tag size={12} className="mr-1" />
-                      {product.category.charAt(0).toUpperCase() + product.category.slice(1)}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-fashion-primary">
-                    ₹{product.price.toFixed(2)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <button 
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-fashion-primary">
+                        <Tag size={12} className="mr-1" />
+                        {product.category.charAt(0).toUpperCase() + product.category.slice(1)}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-fashion-primary">
+                      ₹{product.price.toFixed(2)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <button 
                         onClick={() => handleToggleInStock(product._id)}
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        product.inStock 
-                          ? "bg-green-100 text-green-800" 
-                          : "bg-red-100 text-red-800"
-                      }`}
-                    >
-                      {product.inStock ? (
-                        <>
-                          <CheckCircle2 size={12} className="mr-1" />
-                          In Stock
-                        </>
-                      ) : (
-                        <>
-                          <XCircle size={12} className="mr-1" />
-                          Out of Stock
-                        </>
-                      )}
-                    </button>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <button
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          product.inStock 
+                            ? "bg-green-100 text-green-800" 
+                            : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {product.inStock ? (
+                          <>
+                            <CheckCircle2 size={12} className="mr-1" />
+                            In Stock
+                          </>
+                        ) : (
+                          <>
+                            <XCircle size={12} className="mr-1" />
+                            Out of Stock
+                          </>
+                        )}
+                      </button>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <button
                         onClick={() => handleToggleFeatured(product._id)}
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        product.featured 
-                          ? "bg-blue-100 text-blue-800" 
-                          : "bg-gray-100 text-gray-800"
-                      }`}
-                    >
-                      {product.featured ? "Featured" : "Not Featured"}
-                    </button>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <div className="flex space-x-3 justify-end">
-                      <button
-                        onClick={() => handleEditProduct(product)}
-                        className="text-blue-600 hover:text-blue-800"
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          product.featured 
+                            ? "bg-blue-100 text-blue-800" 
+                            : "bg-gray-100 text-gray-800"
+                        }`}
                       >
-                        <Edit size={18} />
+                        {product.featured ? "Featured" : "Not Featured"}
                       </button>
-                      <button
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <div className="flex space-x-3 justify-end">
+                        <button
+                          onClick={() => handleEditProduct(product)}
+                          className="text-blue-600 hover:text-blue-800"
+                        >
+                          <Edit size={18} />
+                        </button>
+                        <button
                           onClick={() => handleDeleteProduct(product._id)}
-                        className="text-red-600 hover:text-red-800"
-                      >
-                        <Trash2 size={18} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
+                          className="text-red-600 hover:text-red-800"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
                 ))
               )}
             </tbody>

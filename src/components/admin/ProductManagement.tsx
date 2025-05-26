@@ -35,6 +35,8 @@ const ProductManagement: React.FC = () => {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [categories, setCategories] = useState<string[]>(["all"]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const productsPerPage = 10;
   
   // Debounce search term
   useEffect(() => {
@@ -75,6 +77,17 @@ const ProductManagement: React.FC = () => {
     return searchProducts(allProducts, debouncedSearchTerm);
   }, [allProducts, debouncedSearchTerm, searchProducts]);
 
+  // Calculate pagination
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
+
+  // Handle page change
+  const handlePageChange = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+  };
+  
   // Fetch products
   const fetchProducts = async () => {
     try {
@@ -369,7 +382,7 @@ const ProductManagement: React.FC = () => {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
         <h2 className="text-2xl font-bold text-fashion-primary">Products</h2>
         <div className="flex gap-2">
-          <Button
+          {/* <Button
             variant="outline"
             size="sm"
             onClick={handleExportShippingAddresses}
@@ -377,7 +390,7 @@ const ProductManagement: React.FC = () => {
           >
             <FileText size={16} />
             <span>Export Shipping Addresses</span>
-          </Button>
+          </Button> */}
         <Button
           onClick={handleAddNewProduct}
           className="bg-[#4AA79F] hover:bg-[#4AA79F]/90 flex items-center space-x-2"
@@ -456,13 +469,15 @@ const ProductManagement: React.FC = () => {
       
       {/* Products Table */}
       <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
-        <div className="overflow-x-scroll">
+        <div className="max-h-[630px] flex flex-col">
+          {/* Fixed Header */}
+          <div className="flex-none">
           <table className="w-full min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+              <thead className="bg-gray-50 sticky top-0 z-10">
               <tr>
-                <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-fashion-primary/60 uppercase tracking-wider">
-                  No
-                </th>
+                  <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-fashion-primary/60 uppercase tracking-wider">
+                    No
+                  </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-fashion-primary/60 uppercase tracking-wider">
                   Product
                 </th>
@@ -473,28 +488,34 @@ const ProductManagement: React.FC = () => {
                   Price
                 </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-fashion-primary/60 uppercase tracking-wider">
-                  Stock
+                    Stock
                 </th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-fashion-primary/60 uppercase tracking-wider">
-                  Status
+                    Status
                 </th>
                 <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-fashion-primary/60 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
             </thead>
+            </table>
+          </div>
+
+          {/* Scrollable Body */}
+          <div className="flex-1 overflow-y-auto">
+            <table className="w-full min-w-full divide-y divide-gray-200">
             <tbody className="bg-white divide-y divide-gray-200">
               {isLoading ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-12 text-center">
+                    <td colSpan={7} className="px-6 py-12 text-center">
                     <div className="flex justify-center items-center">
                       <Loader2 className="w-8 h-8 animate-spin text-[#4AA79F]" />
                     </div>
                   </td>
                 </tr>
-              ) : filteredProducts.length === 0 ? (
+                ) : currentProducts.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-12 text-center text-fashion-primary/60">
+                    <td colSpan={7} className="px-6 py-12 text-center text-fashion-primary/60">
                     <div className="flex flex-col items-center">
                       <Search size={36} className="mb-2 opacity-20" />
                       <p>No products found matching your search criteria.</p>
@@ -510,90 +531,159 @@ const ProductManagement: React.FC = () => {
                   </td>
                 </tr>
               ) : (
-                filteredProducts.map((product, index) => (
+                  currentProducts.map((product, index) => (
                   <tr key={product._id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-fashion-primary/70">
-                      {index + 1}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="h-10 w-10 flex-shrink-0 rounded overflow-hidden bg-gray-100">
-                          <img
-                            src={product.images[0]}
-                            alt={product.name}
-                            className="h-10 w-10 object-cover"
-                          />
-                        </div>
-                        <div className="ml-4">
-                          <div className="text-sm font-medium text-fashion-primary">{product.name}</div>
+                      <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-fashion-primary/70">
+                        {index + 1}
+                      </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center">
+                      <div className="h-10 w-10 flex-shrink-0 rounded overflow-hidden bg-gray-100">
+                        <img
+                          src={product.images[0]}
+                          alt={product.name}
+                          className="h-10 w-10 object-cover"
+                        />
+                      </div>
+                      <div className="ml-4">
+                        <div className="text-sm font-medium text-fashion-primary">{product.name}</div>
                           <div className="text-sm text-fashion-primary/60">ID: {product._id}</div>
-                        </div>
                       </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-fashion-primary">
-                        <Tag size={12} className="mr-1" />
-                        {product.category.charAt(0).toUpperCase() + product.category.slice(1)}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-fashion-primary">
-                      ₹{product.price.toFixed(2)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <button 
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-fashion-primary">
+                      <Tag size={12} className="mr-1" />
+                      {product.category.charAt(0).toUpperCase() + product.category.slice(1)}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-fashion-primary">
+                    ₹{product.price.toFixed(2)}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <button 
                         onClick={() => handleToggleInStock(product._id)}
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          product.inStock 
-                            ? "bg-green-100 text-green-800" 
-                            : "bg-red-100 text-red-800"
-                        }`}
-                      >
-                        {product.inStock ? (
-                          <>
-                            <CheckCircle2 size={12} className="mr-1" />
-                            In Stock
-                          </>
-                        ) : (
-                          <>
-                            <XCircle size={12} className="mr-1" />
-                            Out of Stock
-                          </>
-                        )}
-                      </button>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <button
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        product.inStock 
+                          ? "bg-green-100 text-green-800" 
+                          : "bg-red-100 text-red-800"
+                      }`}
+                    >
+                      {product.inStock ? (
+                        <>
+                          <CheckCircle2 size={12} className="mr-1" />
+                          In Stock
+                        </>
+                      ) : (
+                        <>
+                          <XCircle size={12} className="mr-1" />
+                          Out of Stock
+                        </>
+                      )}
+                    </button>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <button
                         onClick={() => handleToggleFeatured(product._id)}
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          product.featured 
-                            ? "bg-blue-100 text-blue-800" 
-                            : "bg-gray-100 text-gray-800"
-                        }`}
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        product.featured 
+                          ? "bg-blue-100 text-blue-800" 
+                          : "bg-gray-100 text-gray-800"
+                      }`}
+                    >
+                      {product.featured ? "Featured" : "Not Featured"}
+                    </button>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <div className="flex space-x-3 justify-end">
+                      <button
+                        onClick={() => handleEditProduct(product)}
+                        className="text-blue-600 hover:text-blue-800"
                       >
-                        {product.featured ? "Featured" : "Not Featured"}
+                        <Edit size={18} />
                       </button>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="flex space-x-3 justify-end">
-                        <button
-                          onClick={() => handleEditProduct(product)}
-                          className="text-blue-600 hover:text-blue-800"
-                        >
-                          <Edit size={18} />
-                        </button>
-                        <button
+                      <button
                           onClick={() => handleDeleteProduct(product._id)}
-                          className="text-red-600 hover:text-red-800"
-                        >
-                          <Trash2 size={18} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
+                        className="text-red-600 hover:text-red-800"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
                 ))
               )}
             </tbody>
           </table>
+          </div>
+
+          {/* Fixed Pagination */}
+          <div className="flex-none">
+            {!isLoading && filteredProducts.length > 0 && (
+              <div className="px-6 py-4 flex items-center justify-between border-t border-gray-200">
+                <div className="flex-1 flex justify-between sm:hidden">
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Previous
+                  </button>
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Next
+                  </button>
+                </div>
+                <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                  <p className="text-sm text-fashion-primary/60">
+                    Showing <span className="font-medium">{indexOfFirstProduct + 1}</span> to{" "}
+                    <span className="font-medium">
+                      {Math.min(indexOfLastProduct, filteredProducts.length)}
+                    </span> of{" "}
+                    <span className="font-medium">{filteredProducts.length}</span> products
+                  </p>
+                  <div className="flex space-x-1">
+                    <button 
+                      className={`px-3 py-1 border border-gray-300 rounded-md text-sm text-fashion-primary hover:bg-gray-50 ${
+                        currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'bg-white'
+                      }`}
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={currentPage === 1}
+                    >
+                      Previous
+                    </button>
+                    
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                      <button
+                        key={page}
+                        className={`px-3 py-1 rounded-md text-sm ${
+                          currentPage === page
+                            ? 'bg-[#4AA79F] text-white'
+                            : 'bg-white border border-gray-300 text-fashion-primary hover:bg-gray-50'
+                        }`}
+                        onClick={() => handlePageChange(page)}
+                      >
+                        {page}
+                      </button>
+                    ))}
+                    
+                    <button 
+                      className={`px-3 py-1 border border-gray-300 rounded-md text-sm text-fashion-primary hover:bg-gray-50 ${
+                        currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : 'bg-white'
+                      }`}
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                    >
+                      Next
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
       

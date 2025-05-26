@@ -458,172 +458,208 @@ const OrderManagement: React.FC = () => {
       
       {/* Orders Table */}
       <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
-        <div className="overflow-x-scroll">
-          <table className="w-full min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-fashion-primary/60 uppercase tracking-wider">
-                  No
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-fashion-primary/60 uppercase tracking-wider">
-                  Order ID
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-fashion-primary/60 uppercase tracking-wider">
-                  Customer
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-fashion-primary/60 uppercase tracking-wider">
-                  Date
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-fashion-primary/60 uppercase tracking-wider">
-                  Total
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-fashion-primary/60 uppercase tracking-wider">
-                  Status
-                </th>
-                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-fashion-primary/60 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {currentOrders.map((order, index) => (
-                <tr key={order._id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-fashion-primary/70">
-                    {indexOfFirstOrder + index + 1}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-fashion-primary">
-                    {order.orderNumber}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-fashion-primary">
-                    {order.customerInfo.firstName} {order.customerInfo.lastName}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-fashion-primary/70">
-                    {new Date(order.createdAt).toLocaleDateString()} 
-                    <span className="text-fashion-primary/50 ml-1">
-                      {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-fashion-primary">
-                    ₹{order.total.toFixed(2)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeClass(order.status)}`}>
-                      {getStatusIcon(order.status)}
-                      <span className="ml-1">{order.status.charAt(0).toUpperCase() + order.status.slice(1)}</span>
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <div className="inline-flex items-center">
-                      <button 
-                        className="text-blue-600 hover:text-blue-800 p-1"
-                        onClick={() => setSelectedOrder(order)}
-                      >
-                        <Eye size={18} />
-                      </button>
-                      <div className="relative ml-2 group">
-                        <button className="text-gray-600 hover:text-gray-800 p-1">
-                          <MoreHorizontal size={18} />
-                        </button>
-                        
-                        {/* Dropdown menu */}
-                        <div className="absolute right-0 z-10 mt-2 w-48 bg-white rounded-md shadow-lg py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                          <button
-                            className="block w-full text-left px-4 py-2 text-sm text-fashion-primary hover:bg-gray-100"
-                            onClick={() => handleUpdateStatus(order._id, "pending")}
-                          >
-                            Mark as Pending
-                          </button>
-                          <button
-                            className="block w-full text-left px-4 py-2 text-sm text-fashion-primary hover:bg-gray-100"
-                            onClick={() => handleUpdateStatus(order._id, "processing")}
-                          >
-                            Mark as Processing
-                          </button>
-                          <button
-                            className="block w-full text-left px-4 py-2 text-sm text-fashion-primary hover:bg-gray-100"
-                            onClick={() => handleUpdateStatus(order._id, "shipped")}
-                          >
-                            Mark as Shipped
-                          </button>
-                          <button
-                            className="block w-full text-left px-4 py-2 text-sm text-fashion-primary hover:bg-gray-100"
-                            onClick={() => handleUpdateStatus(order._id, "delivered")}
-                          >
-                            Mark as Delivered
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-              
-              {filteredOrders.length === 0 && (
+        <div className="max-h-[800px] flex flex-col">
+          {/* Fixed Header */}
+          <div className="flex-none">
+            <table className="w-full min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50 sticky top-0 z-10">
                 <tr>
-                  <td colSpan={7} className="px-6 py-12 text-center text-fashion-primary/60">
-                    <div className="flex flex-col items-center">
-                      <Search size={36} className="mb-2 opacity-20" />
-                      <p>No orders found matching your search criteria.</p>
-                      {searchTerm && (
-                        <button
-                          onClick={() => setSearchTerm("")}
-                          className="mt-2 text-blue-600 hover:underline"
-                        >
-                          Clear search
-                        </button>
-                      )}
-                    </div>
-                  </td>
+                  <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-fashion-primary/60 uppercase tracking-wider">
+                    Order ID
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-fashion-primary/60 uppercase tracking-wider">
+                    Customer
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-fashion-primary/60 uppercase tracking-wider">
+                    Date
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-fashion-primary/60 uppercase tracking-wider">
+                    Total
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-fashion-primary/60 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-fashion-primary/60 uppercase tracking-wider">
+                    Actions
+                  </th>
                 </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-      
-      {/* Pagination */}
-      <div className="flex justify-between items-center">
-        <p className="text-sm text-fashion-primary/60">
-          Showing <span className="font-medium">{indexOfFirstOrder + 1}</span> to{" "}
-          <span className="font-medium">
-            {Math.min(indexOfLastOrder, filteredOrders.length)}
-          </span> of{" "}
-          <span className="font-medium">{filteredOrders.length}</span> orders
-        </p>
-        <div className="flex space-x-1">
-          <button 
-            className={`px-3 py-1 border border-gray-300 rounded-md text-sm text-fashion-primary hover:bg-gray-50 ${
-              currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'bg-white'
-            }`}
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-          >
-            Previous
-          </button>
-          
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-            <button
-              key={page}
-              className={`px-3 py-1 rounded-md text-sm ${
-                currentPage === page
-                  ? 'bg-fashion-primary text-white'
-                  : 'bg-white border border-gray-300 text-fashion-primary hover:bg-gray-50'
-              }`}
-              onClick={() => handlePageChange(page)}
-            >
-              {page}
-            </button>
-          ))}
-          
-          <button 
-            className={`px-3 py-1 border border-gray-300 rounded-md text-sm text-fashion-primary hover:bg-gray-50 ${
-              currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : 'bg-white'
-            }`}
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-          >
-            Next
-          </button>
+              </thead>
+            </table>
+          </div>
+
+          {/* Scrollable Body */}
+          <div className="flex-1 overflow-y-auto">
+            <table className="w-full min-w-full divide-y divide-gray-200">
+              <tbody className="bg-white divide-y divide-gray-200">
+                {isLoading ? (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-12 text-center">
+                      <div className="flex justify-center items-center">
+                        <Loader2 className="w-8 h-8 animate-spin text-[#4AA79F]" />
+                      </div>
+                    </td>
+                  </tr>
+                ) : currentOrders.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-12 text-center text-fashion-primary/60">
+                      <div className="flex flex-col items-center">
+                        <Search size={36} className="mb-2 opacity-20" />
+                        <p>No orders found matching your search criteria.</p>
+                        {searchTerm && (
+                          <button
+                            onClick={() => setSearchTerm("")}
+                            className="mt-2 text-blue-600 hover:underline"
+                          >
+                            Clear search
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  currentOrders.map((order, index) => (
+                    <tr key={order._id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-fashion-primary/70">
+                        {indexOfFirstOrder + index + 1}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-fashion-primary">
+                        {order.orderNumber}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-fashion-primary">
+                        {order.customerInfo.firstName} {order.customerInfo.lastName}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-fashion-primary/70">
+                        {new Date(order.createdAt).toLocaleDateString()} 
+                        <span className="text-fashion-primary/50 ml-1">
+                          {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-fashion-primary">
+                        ₹{order.total.toFixed(2)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeClass(order.status)}`}>
+                          {getStatusIcon(order.status)}
+                          <span className="ml-1">{order.status.charAt(0).toUpperCase() + order.status.slice(1)}</span>
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <div className="inline-flex items-center">
+                          <button 
+                            className="text-blue-600 hover:text-blue-800 p-1"
+                            onClick={() => setSelectedOrder(order)}
+                          >
+                            <Eye size={18} />
+                          </button>
+                          <div className="relative ml-2 group">
+                            <button className="text-gray-600 hover:text-gray-800 p-1">
+                              <MoreHorizontal size={18} />
+                            </button>
+                            
+                            {/* Dropdown menu */}
+                            <div className="fixed z-50  w-48 bg-white rounded-md shadow-lg py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 border border-gray-100 right-10">
+                              <button
+                                className="block w-full text-left px-4 py-2 text-sm text-fashion-primary hover:bg-gray-100"
+                                onClick={() => handleUpdateStatus(order._id, "pending")}
+                              >
+                                Mark as Pending
+                              </button>
+                              <button
+                                className="block w-full text-left px-4 py-2 text-sm text-fashion-primary hover:bg-gray-100"
+                                onClick={() => handleUpdateStatus(order._id, "processing")}
+                              >
+                                Mark as Processing
+                              </button>
+                              <button
+                                className="block w-full text-left px-4 py-2 text-sm text-fashion-primary hover:bg-gray-100"
+                                onClick={() => handleUpdateStatus(order._id, "shipped")}
+                              >
+                                Mark as Shipped
+                              </button>
+                              <button
+                                className="block w-full text-left px-4 py-2 text-sm text-fashion-primary hover:bg-gray-100"
+                                onClick={() => handleUpdateStatus(order._id, "delivered")}
+                              >
+                                Mark as Delivered
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Fixed Pagination */}
+          <div className="flex-none">
+            {!isLoading && filteredOrders.length > 0 && (
+              <div className="px-6 py-4 flex items-center justify-between border-t border-gray-200">
+                <div className="flex-1 flex justify-between sm:hidden">
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Previous
+                  </button>
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Next
+                  </button>
+                </div>
+                <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                  <p className="text-sm text-fashion-primary/60">
+                    Showing <span className="font-medium">{indexOfFirstOrder + 1}</span> to{" "}
+                    <span className="font-medium">
+                      {Math.min(indexOfLastOrder, filteredOrders.length)}
+                    </span> of{" "}
+                    <span className="font-medium">{filteredOrders.length}</span> orders
+                  </p>
+                  <div className="flex space-x-1">
+                    <button 
+                      className={`px-3 py-1 border border-gray-300 rounded-md text-sm text-fashion-primary hover:bg-gray-50 ${
+                        currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'bg-white'
+                      }`}
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={currentPage === 1}
+                    >
+                      Previous
+                    </button>
+                    
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                      <button
+                        key={page}
+                        className={`px-3 py-1 rounded-md text-sm ${
+                          currentPage === page
+                            ? 'bg-[#4AA79F] text-white'
+                            : 'bg-white border border-gray-300 text-fashion-primary hover:bg-gray-50'
+                        }`}
+                        onClick={() => handlePageChange(page)}
+                      >
+                        {page}
+                      </button>
+                    ))}
+                    
+                    <button 
+                      className={`px-3 py-1 border border-gray-300 rounded-md text-sm text-fashion-primary hover:bg-gray-50 ${
+                        currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : 'bg-white'
+                      }`}
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                    >
+                      Next
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

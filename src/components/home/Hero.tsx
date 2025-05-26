@@ -90,7 +90,7 @@ const Hero = () => {
 
         {/* Animated Image - Hidden below lg (1024px) */}
         <div className="relative w-[320px] h-[480px] sm:w-[400px] sm:h-[600px] lg:ml-16 mt-12 lg:mt-0 animate-float hidden lg:block">
-          <div className="absolute inset-0 bg-gradient-to-br from-secondary to-transparent rounded-3xl -rotate-6 shadow-xl"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-fashion-primary  to-transparent rounded-3xl -rotate-6 shadow-xl"></div>
           <div className="absolute inset-0 rounded-[2rem] glass-panel rotate-3 overflow-hidden">
             <div className="absolute rounded-3xl inset-0 bg-[url('https://i.pinimg.com/736x/f7/9a/87/f79a8780381223e4e552483d0044641b.jpg')] bg-cover bg-center"></div>
             <div className="absolute bottom-0 left-0 right-0 p-6 text-black">

@@ -13,32 +13,32 @@ const ITEMS_PER_PAGE = 12;
 
 // Loading Skeleton Component
 const LoadingSkeleton = () => (
-  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
     {Array.from({ length: 4 }).map((_, i) => (
-      <div key={i} className="bg-white rounded-xl shadow-sm overflow-hidden animate-pulse">
+        <div key={i} className="bg-white rounded-xl shadow-sm overflow-hidden animate-pulse">
         <div className="h-80 bg-gray-200" />
-        <div className="p-6 space-y-4">
+          <div className="p-6 space-y-4">
           <div className="h-4 bg-gray-200 rounded w-3/4" />
           <div className="h-6 bg-gray-200 rounded w-1/2" />
+          </div>
         </div>
-      </div>
-    ))}
-  </div>
-);
+      ))}
+    </div>
+  );
 
 // Optimized product mapping function
 const mapProduct = (product: any): Product => ({
-  _id: product._id.toString(),
-  name: product.name,
-  description: product.description,
-  price: product.price,
-  images: product.images,
-  category: product.category,
-  sizes: product.sizes,
-  colors: product.colors,
-  inStock: product.inStock,
-  featured: product.featured,
-  createdAt: product.createdAt,
+      _id: product._id.toString(),
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      images: product.images,
+      category: product.category,
+      sizes: product.sizes,
+      colors: product.colors,
+      inStock: product.inStock,
+      featured: product.featured,
+      createdAt: product.createdAt,
   updatedAt: product.updatedAt,
   stock: product.stock || 0,
   sku: product.sku || '',
@@ -105,15 +105,15 @@ const TurbancapsPage = async ({
         </div>
         
         <React.Suspense fallback={<LoadingSkeleton />}>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {turbancapsProducts.map((product, index) => (
-              <ProductCard 
-                key={product._id} 
-                product={product} 
-                index={index} 
-              />
-            ))}
-          </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {turbancapsProducts.map((product, index) => (
+            <ProductCard 
+              key={product._id} 
+              product={product} 
+              index={index} 
+            />
+          ))}
+        </div>
 
           {/* Pagination */}
           {totalPages > 1 && (

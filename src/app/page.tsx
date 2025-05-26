@@ -5,6 +5,7 @@ import Hero from "@/components/home/Hero";
 import FeaturedCollection from "@/components/home/FeaturedCollection";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import NewArrivals from "../app/new-arrivals/page";
 
 const Index = () => {
   return (
@@ -13,6 +14,48 @@ const Index = () => {
       <main className="flex-grow">
         <Hero />
         
+
+        <section className="py-16">
+          <div className="container px-4 mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {[
+                {
+                  title: "Mens",
+                  image: "https://www.alkameez.com/cdn/shop/files/2_9340c8cd-c2a4-43a3-ae09-c3a0cc0455b4.png?v=1747737108&width=720",
+                  link: "/mensthobas"
+                },
+                {
+                  title: "Kids",
+                  image: "https://www.alkameez.com/cdn/shop/files/website_kids_banner_final.png?v=1747737399&width=720",
+                  link: "/kidsthobas"
+                }
+              ].map((item, index) => (
+                <div key={index} className="relative group overflow-hidden rounded-lg shadow-sm">
+                  <Link href={item.link}>
+                  <div className="h-[25rem] ">
+                    <img 
+                      src={item.image} 
+                      alt={item.title} 
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
+                  </div>
+                  </Link>
+                  <div className="absolute bottom-0 left-0 right-0 p-6">
+                    <h3 className="text-[3rem] font-semibold text-white font-['Adelone-Serial-Extrabold-Regular'] ">{item.title}</h3>
+                    <div className="transform translate-y-6 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+                      <Button variant="outline" className="bg-white/90 backdrop-blur-sm ml-[30%] xl:ml-[40%]  text-fashion-950 font-['Adelone-Serial-Extrabold-Regular'] hover:bg-white border-0" asChild>
+                        <Link href={item.link}>
+                          Explore Collection
+                        </Link>
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
         
         <section className="py-16">
           <div className="container px-4 mx-auto">
@@ -24,38 +67,42 @@ const Index = () => {
               </p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {[
                 {
                   title: "Emarathi",
-                  image: "https://i.pinimg.com/736x/c5/3c/9b/c53c9bcd79b385ae73cf5724f253adcc.jpg",
+                  image: "https://www.alkameez.com/cdn/shop/files/EMARATI_NEW_3.png?v=1733921814&width=750",
                   link: "/emarathi"
                 },
                 {
                   title: "Omani",
-                  image: "https://i.pinimg.com/736x/12/7b/1c/127b1cd0e987e2e5733d6c124a2a9b8e.jpg",
+                  image: "https://www.alkameez.com/cdn/shop/files/OMANI_NEW_1.png?v=1733921248&width=750",
                   link: "/omani"
                 },
                 {
                   title: "Saudi",
-                  image: "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1160&q=80",
+                  image: "https://www.alkameez.com/cdn/shop/files/SAUDI_NEW_1.png?v=1733918348&width=750",
                   link: "/saudi"
                 },
                 {
                   title: "Morocan",
-                  image: "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1160&q=80",
+                  image: "https://www.alkameez.com/cdn/shop/files/6_b7840197-323d-491d-ab47-ce1e58ad39d0.png?v=1740916392&width=750",
                   link: "/morocan"
                 }
               ].map((item, index) => (
                 <div key={index} className="relative group overflow-hidden rounded-lg shadow-sm">
-                  <div className="aspect-[4/5]">
+                  <Link href={item.link}>
+                  <div className="h-[25rem] ">
+                  
                     <img 
                       src={item.image} 
                       alt={item.title} 
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                     />
+                    
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
                   </div>
+                  </Link>
                   <div className="absolute bottom-0 left-0 right-0 p-6">
                     <h3 className="text-[3rem] font-semibold text-white font-['Adelone-Serial-Extrabold-Regular'] ">{item.title}</h3>
                     <div className="transform translate-y-6 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
@@ -71,6 +118,10 @@ const Index = () => {
             </div>
           </div>
         </section>
+         
+
+         <NewArrivals/>
+        
 
         <FeaturedCollection />
 
@@ -227,9 +278,9 @@ const Index = () => {
                     Sign up today and get 15% off your first purchase. Join thousands of satisfied customers who've revolutionized their shopping experience.
                   </p>
                   <div className="flex flex-col sm:flex-row gap-4">
-                    <a href="/signup" className="btn-primary text-center ">
+                    {/* <a href="/signup" className="btn-primary text-center ">
                       Create an Account
-                    </a>
+                    </a> */}
                     <a href="/products" className="btn-secondary text-center">
                       Browse Collection
                     </a>

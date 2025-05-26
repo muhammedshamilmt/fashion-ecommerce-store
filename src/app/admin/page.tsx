@@ -280,8 +280,10 @@ const AdminPage = () => {
         </div>
 
         {/* Footer */}
-        <footer className="bg-white border-t border-gray-200 p-4 text-center text-sm text-fashion-primary/60">
-          &copy; {new Date().getFullYear()} FashionFit Admin Panel. All rights reserved.
+        <footer className="bg-white border-t border-gray-200 p-4 text-center flex justify-center text-sm text-fashion-primary/60">
+          {/* &copy; {new Date().getFullYear()} FashionFit Admin Panel. All rights reserved. */}
+          <p className=" font-['Adelone-Serial-Extrabold-Regular'] text-fashion-primary ">&copy; {new Date().getFullYear()} AL-HYABA. </p>
+          <p>All rights reserved.</p>
         </footer>
       </main>
 

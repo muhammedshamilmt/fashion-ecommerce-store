@@ -146,6 +146,19 @@ const ProductForm: React.FC<ProductFormProps> = ({
         // Create new AbortController for this upload
         abortController.current = new AbortController();
 
+        // Show loading toast with progress
+        const toastId = toast.loading(
+          <div className="w-full">
+            <div className="text-sm font-medium mb-2">Uploading {file.name}...</div>
+            <div className="w-full bg-gray-200 rounded-full h-2">
+              <div 
+                className="bg-gradient-to-r from-[#4AA79F] to-[#2C6E67] h-2 rounded-full transition-all duration-300" 
+                style={{ width: '0%' }}
+              />
+            </div>
+          </div>
+        );
+
         // Upload to ImageKit
         const uploadResponse = await upload({
           file,
@@ -157,7 +170,22 @@ const ProductForm: React.FC<ProductFormProps> = ({
           token,
           publicKey,
           onProgress: (event) => {
-            setUploadProgress((event.loaded / event.total) * 100);
+            const progress = (event.loaded / event.total) * 100;
+            setUploadProgress(progress);
+            
+            // Update toast progress
+            toast.loading(
+              <div className="w-full">
+                <div className="text-sm font-medium mb-2">Uploading {file.name}...</div>
+                <div className="w-[300px] bg-gray-200 rounded-full h-2">
+                  <div 
+                    className="bg-gradient-to-r from-[#4AA79F] to-[#2C6E67] h-2 rounded-full transition-all duration-300" 
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
+              </div>,
+              { id: toastId }
+            );
           },
           abortSignal: abortController.current.signal,
         });
@@ -175,7 +203,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
         // Add to uploaded images state with explicit type
         setUploadedImages(prev => [...prev, { url: imageUrl, file }]);
         
-        toast.success("Image uploaded successfully");
+        // Show success toast
+        toast.success("Image uploaded successfully", { id: toastId });
       } catch (error) {
         if (error instanceof ImageKitAbortError) {
           toast.error("Upload was cancelled");

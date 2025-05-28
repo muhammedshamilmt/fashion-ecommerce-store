@@ -4,6 +4,8 @@ import { Providers } from "@/components/providers";
 import ClientLayout from './client-layout';
 import { ImageKitProvider } from "@/components/providers/ImageKitProvider";
 import { Suspense } from 'react';
+import Navbar from '@/components/layout/Navbar';
+import Footer from '@/components/layout/Footer';
 
 export const metadata: Metadata = {
   title: 'AL-HAYBA', // Your website title
@@ -20,7 +22,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Suspense fallback={<div>hello</div>}>
           <ImageKitProvider>
             <Providers>
+              <Navbar/>
               <ClientLayout>{children}</ClientLayout>
+             
             </Providers>
           </ImageKitProvider>
         </Suspense>

@@ -5,7 +5,7 @@ import Hero from "@/components/home/Hero";
 import FeaturedCollection from "@/components/home/FeaturedCollection";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import NewArrivals from "../app/new-arrivals/page";
+import NewArrivals from "../app/newarraivals/page";
 
 const Index = () => {
   return (
@@ -203,7 +203,7 @@ const Index = () => {
                   ))}
                 </div>
                 <p className="mb-4 text-white/90">
-                  "The 3D scanning technology is a game-changer! I've never had clothes fit so perfectly. No more returns for me."
+                  "Absolutely amazing service! Fast delivery and top-quality products. Highly recommend!"
                 </p>
                 <div className="flex items-center">
                   <div className="w-10 h-10 rounded-full overflow-hidden mr-3">
@@ -226,7 +226,7 @@ const Index = () => {
                   ))}
                 </div>
                 <p className="mb-4 text-white/90">
-                  "Virtual try-on is so convenient! I can shop from anywhere and know exactly how outfits will look on me. Brilliant!"
+                  "Great experience overall. Customer support was helpful and resolved my issue quickly."
                 </p>
                 <div className="flex items-center">
                   <div className="w-10 h-10 rounded-full overflow-hidden mr-3">
@@ -249,7 +249,7 @@ const Index = () => {
                   ))}
                 </div>
                 <p className="mb-4 text-white/90">
-                  "The AI recommendations are spot on! FashionFit has completely transformed how I discover new styles that suit my body."
+                  "I love this brand! Everything from ordering to receiving my package was seamless and satisfying."
                 </p>
                 <div className="flex items-center">
                   <div className="w-10 h-10 rounded-full overflow-hidden mr-3">
@@ -281,7 +281,7 @@ const Index = () => {
                     {/* <a href="/signup" className="btn-primary text-center ">
                       Create an Account
                     </a> */}
-                    <a href="/products" className="btn-secondary text-center">
+                    <a href="/products" className="btn-secondary text-center hover:bg-fashion-primary hover:text-white"  >
                       Browse Collection
                     </a>
                   </div>

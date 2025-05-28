@@ -80,8 +80,8 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
 
   const handleBuyNow = () => {
     if (!product) return;
-    addItem(product, quantity, selectedSize, selectedColor);
-    router.push("/checkout");
+    // Skip adding to cart and directly proceed to checkout
+    router.push(`/checkout?productId=${product._id}&quantity=${quantity}&size=${selectedSize}&color=${selectedColor}`);
   };
 
   const handleWishlist = () => {

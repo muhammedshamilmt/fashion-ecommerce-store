@@ -23,7 +23,7 @@ const NewArrivals = () => {
         </div>
         
         <div className="text-center mb-10">
-          <h1 className="text-3xl font-bold text-fashion-primary mb-4">New Arrivals</h1>
+          <h1 className="text-5xl font-bold text-fashion-primary mb-4 font-['Adelone-Serial-Extrabold-Regular'] ">New Arrivals</h1>
           <p className="text-muted-foreground max-w-2xl mx-auto">
             Discover our latest fashion arrivals, hot off the runway and ready for your wardrobe.
           </p>
@@ -31,7 +31,7 @@ const NewArrivals = () => {
         
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {newArrivalsProducts.map((product, index) => (
-            <ProductCard key={product.id} product={product} index={index} />
+            <ProductCard key={product._id} product={product} index={index} />
           ))}
         </div>
       </div>

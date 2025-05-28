@@ -195,12 +195,12 @@ const Navbar: React.FC = () => {
 
           {isAuthenticated ? (
             <>
-              <Link href="/profile" className="text-lg font-medium text-fashion-primary hover:text-fashion-primary/80 flex items-center space-x-2">
+              {/* <Link href="/profile" className="text-lg font-medium text-fashion-primary hover:text-fashion-primary/80 flex items-center space-x-2">
                 <User size={20} /><span>My Profile</span>
               </Link>
               <Link href="/orders" className="text-lg font-medium text-fashion-primary hover:text-fashion-primary/80 flex items-center space-x-2">
                 <span>My Orders</span>
-              </Link>
+              </Link> */}
               <button onClick={logout} className="text-lg font-medium text-fashion-primary hover:text-fashion-primary/80 text-left">
                 Logout
               </button>

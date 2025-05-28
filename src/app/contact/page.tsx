@@ -350,47 +350,7 @@ const Contact = () => {
                       />
                     </div>
 
-                    <div>
-                      <Label className="text-gray-700">Attachment (Optional)</Label>
-                      <div className="mt-2">
-                        {previewUrl ? (
-                          <div className="relative w-40 h-40 rounded-lg overflow-hidden">
-                            <Image
-                              src={previewUrl}
-                              alt="Preview"
-                              fill
-                              className="object-cover"
-                            />
-                            <button
-                              type="button"
-                              onClick={removeImage}
-                              className="absolute top-2 right-2 bg-black bg-opacity-50 text-white rounded-full p-1 hover:bg-opacity-70"
-                            >
-                              <X size={16} />
-                            </button>
-                          </div>
-                        ) : (
-                          <div className="flex items-center justify-center w-full">
-                            <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
-                              <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                                <Upload className="w-8 h-8 mb-2 text-gray-500" />
-                                <p className="mb-2 text-sm text-gray-500">
-                                  <span className="font-semibold">Click to upload</span> or drag and drop
-                                </p>
-                                <p className="text-xs text-gray-500">PNG, JPG or JPEG (MAX. 5MB)</p>
-                              </div>
-                              <input
-                                ref={fileInputRef}
-                                type="file"
-                                className="hidden"
-                                accept="image/*"
-                                onChange={handleImageChange}
-                              />
-                            </label>
-                          </div>
-                        )}
-                      </div>
-                    </div>
+                    \
                     
                     <Button
                       type="submit"

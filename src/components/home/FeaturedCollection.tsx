@@ -2,28 +2,52 @@ import React from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import FeaturedProductsGrid from "./FeaturedProductsGrid";
+import { connectToDatabase } from "@/lib/mongodb";
+import { Product } from "@/utils/data";
 
 // Server Component
-async function getFeaturedProducts() {
+async function getFeaturedProducts(): Promise<Product[]> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-    const response = await fetch(`${baseUrl}/api/products/featured`, {
-      cache: 'no-store'
-    });
+    const { db } = await connectToDatabase();
     
-    if (!response.ok) {
-      throw new Error('Failed to fetch featured products');
+    // First try to fetch featured products
+    let featuredProducts = await db
+      .collection("products")
+      .find({ featured: true })
+      .limit(8)
+      .toArray();
+
+    // If no featured products found, fetch latest products as fallback
+    if (!featuredProducts || featuredProducts.length === 0) {
+      featuredProducts = await db
+        .collection("products")
+        .find()
+        .sort({ createdAt: -1 })
+        .limit(8)
+        .toArray();
     }
 
-    const result = await response.json();
-    
-    if (!result.success) {
-      throw new Error(result.error || 'Failed to fetch featured products');
-    }
-
-    return result.data;
+    // Format the products to ensure all required fields are present
+    return featuredProducts.map(product => ({
+      _id: product._id.toString(),
+      name: product.name || 'Unnamed Product',
+      description: product.description || '',
+      price: product.price || 0,
+      images: product.images || [],
+      category: product.category || 'Uncategorized',
+      sizes: product.sizes || [],
+      colors: product.colors || [],
+      featured: product.featured || false,
+      inStock: product.inStock || true,
+      createdAt: product.createdAt || new Date().toISOString(),
+      updatedAt: product.updatedAt || new Date().toISOString(),
+      stock: product.stock || 0,
+      sku: product.sku || '',
+      material: product.material || '',
+      brand: product.brand || ''
+    }));
   } catch (error) {
-    console.error('Error fetching featured products:', error);
+    console.error("Error fetching featured products:", error);
     return [];
   }
 }
@@ -74,7 +98,13 @@ const FeaturedCollection = async () => {
         </div>
 
         <React.Suspense fallback={<LoadingSkeleton />}>
-          <FeaturedProductsGrid products={featuredProducts} />
+          {featuredProducts.length > 0 ? (
+            <FeaturedProductsGrid products={featuredProducts} />
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-fashion-primary/60">No featured products available at the moment.</p>
+            </div>
+          )}
         </React.Suspense>
       </div>
     </section>

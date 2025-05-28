@@ -78,6 +78,25 @@ const placeholderImages = [
   "https://images.unsplash.com/photo-1551107696-a4b0c5a0d9a2?q=80&w=2940&auto=format&fit=crop",
 ];
 
+// Add this custom toast component
+const UploadProgressToast = ({ progress }: { progress: number }) => (
+  <div className="w-[300px]">
+    <div className="flex items-center justify-between mb-2">
+      <span className="text-sm font-medium">Uploading Image...</span>
+      <span className="text-sm text-gray-500">{Math.round(progress)}%</span>
+    </div>
+    <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+      <div 
+        className="h-full rounded-full transition-all duration-300 ease-in-out"
+        style={{
+          width: `${progress}%`,
+          background: 'linear-gradient(90deg, #4AA79F 0%, #2B3972 100%)'
+        }}
+      />
+    </div>
+  </div>
+);
+
 const ProductForm: React.FC<ProductFormProps> = ({
   open,
   onOpenChange,
@@ -89,6 +108,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const abortController = useRef<AbortController | null>(null);
+  const [uploadToastId, setUploadToastId] = useState<string | null>(null);
 
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
@@ -139,6 +159,13 @@ const ProductForm: React.FC<ProductFormProps> = ({
       }
 
       try {
+        // Show upload progress toast
+        const toastId = toast.loading(
+          <UploadProgressToast progress={0} />,
+          { duration: Infinity }
+        ) as string;
+        setUploadToastId(toastId);
+
         // Get authentication parameters
         const authParams = await authenticator();
         const { signature, expire, token, publicKey } = authParams;
@@ -150,14 +177,20 @@ const ProductForm: React.FC<ProductFormProps> = ({
         const uploadResponse = await upload({
           file,
           fileName: file.name,
-          folder: "/products", // Store in products folder
+          folder: "/products",
           useUniqueFileName: true,
           signature,
           expire,
           token,
           publicKey,
           onProgress: (event) => {
-            setUploadProgress((event.loaded / event.total) * 100);
+            const progress = (event.loaded / event.total) * 100;
+            setUploadProgress(progress);
+            // Update toast with new progress
+            toast.loading(
+              <UploadProgressToast progress={progress} />,
+              { id: toastId }
+            );
           },
           abortSignal: abortController.current.signal,
         });
@@ -172,11 +205,20 @@ const ProductForm: React.FC<ProductFormProps> = ({
         const currentImages = form.getValues("images") || [];
         form.setValue("images", [...currentImages, imageUrl]);
         
-        // Add to uploaded images state with explicit type
+        // Add to uploaded images state
         setUploadedImages(prev => [...prev, { url: imageUrl, file }]);
         
+        // Dismiss progress toast and show success
+        toast.dismiss(toastId);
         toast.success("Image uploaded successfully");
+        setUploadToastId(null);
       } catch (error) {
+        // Dismiss progress toast if it exists
+        if (uploadToastId) {
+          toast.dismiss(uploadToastId);
+          setUploadToastId(null);
+        }
+
         if (error instanceof ImageKitAbortError) {
           toast.error("Upload was cancelled");
         } else if (error instanceof ImageKitInvalidRequestError) {

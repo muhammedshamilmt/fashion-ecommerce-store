@@ -557,7 +557,7 @@ const OrderManagement: React.FC = () => {
                             </button>
                             
                             {/* Dropdown menu */}
-                            <div className="fixed z-50  w-48 bg-white rounded-md shadow-lg py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 border border-gray-100 right-10">
+                            <div className="absolute right-0 z-50 mt-2 w-48 bg-white rounded-md shadow-lg py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 border border-gray-100">
                               <button
                                 className="block w-full text-left px-4 py-2 text-sm text-fashion-primary hover:bg-gray-100"
                                 onClick={() => handleUpdateStatus(order._id, "pending")}

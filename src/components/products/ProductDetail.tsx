@@ -74,14 +74,38 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
 
   const handleAddToCart = () => {
     if (!product) return;
+    
+    // Check if size and color are selected
+    if (!selectedSize || !selectedColor) {
+      toast.error("Please select size and color");
+      return;
+    }
+
+    // Add item to cart
     addItem(product, quantity, selectedSize, selectedColor);
     toast.success(`${product.name} added to cart`);
   };
 
   const handleBuyNow = () => {
     if (!product) return;
-    // Skip adding to cart and directly proceed to checkout
-    router.push(`/checkout?productId=${product._id}&quantity=${quantity}&size=${selectedSize}&color=${selectedColor}`);
+
+    // Check if size and color are selected
+    if (!selectedSize || !selectedColor) {
+      toast.error("Please select size and color");
+      return;
+    }
+
+    // Store the product details in sessionStorage for checkout
+    const checkoutItem = {
+      product,
+      quantity,
+      size: selectedSize,
+      color: selectedColor
+    };
+    sessionStorage.setItem('checkoutItem', JSON.stringify(checkoutItem));
+    
+    // Redirect to checkout
+    router.push('/checkout?direct=true');
   };
 
   const handleWishlist = () => {

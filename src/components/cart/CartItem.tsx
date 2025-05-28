@@ -3,11 +3,20 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { X, Minus, Plus } from "lucide-react";
-import { CartItem as CartItemType } from "@/utils/data";
 import { useCart } from "@/contexts/CartContext";
 
 interface CartItemProps {
-  item: CartItemType;
+  item: {
+    product: {
+      _id: string;
+      name: string;
+      price: number;
+      images: string[];
+    };
+    quantity: number;
+    size: string;
+    color: string;
+  };
 }
 
 const CartItem: React.FC<CartItemProps> = ({ item }) => {
@@ -16,7 +25,11 @@ const CartItem: React.FC<CartItemProps> = ({ item }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
 
   const handleQuantityChange = (newQuantity: number) => {
-    updateQuantity(product.id, newQuantity);
+    updateQuantity(product._id, size, color, newQuantity);
+  };
+
+  const handleRemove = () => {
+    removeItem(product._id, size, color);
   };
 
   return (
@@ -40,7 +53,7 @@ const CartItem: React.FC<CartItemProps> = ({ item }) => {
       <div className="flex-1 sm:ml-6 flex flex-col sm:flex-row sm:justify-between">
         <div className="space-y-1">
           <Link
-            href={`/products/${product.id}`}
+            href={`/products/${product._id}`}
             className="font-medium text-fashion-primary hover:text-fashion-primary/80 transition-colors"
           >
             {product.name}
@@ -79,7 +92,7 @@ const CartItem: React.FC<CartItemProps> = ({ item }) => {
           
           {/* Remove Item */}
           <button
-            onClick={() => removeItem(product.id)}
+            onClick={handleRemove}
             className="text-fashion-primary/60 hover:text-fashion-primary transition-colors"
             aria-label="Remove item"
           >

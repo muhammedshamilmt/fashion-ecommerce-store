@@ -15,11 +15,50 @@ const OrderNumberOverlay: React.FC<OrderNumberOverlayProps> = ({ orderNumber, on
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(orderNumber);
+      // Try using the Clipboard API first
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(orderNumber);
+      } else {
+        // Fallback for non-secure contexts or when Clipboard API is not available
+        const textArea = document.createElement('textarea');
+        textArea.value = orderNumber;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        textArea.style.top = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        
+        try {
+          document.execCommand('copy');
+          textArea.remove();
+        } catch (err) {
+          console.error('Fallback copy failed:', err);
+          textArea.remove();
+          throw new Error('Copy failed');
+        }
+      }
+      
       setCopied(true);
       toast.success('Order number copied to clipboard!');
     } catch (err) {
-      toast.error('Failed to copy order number');
+      console.error('Copy failed:', err);
+      toast.error('Failed to copy order number. Please try selecting and copying manually.');
+      
+      // Create a temporary input for manual copy
+      const tempInput = document.createElement('input');
+      tempInput.value = orderNumber;
+      tempInput.style.position = 'fixed';
+      tempInput.style.left = '-999999px';
+      tempInput.style.top = '-999999px';
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      tempInput.focus();
+      
+      // Remove the temporary input after a short delay
+      setTimeout(() => {
+        document.body.removeChild(tempInput);
+      }, 100);
     }
   };
 
@@ -48,7 +87,7 @@ const OrderNumberOverlay: React.FC<OrderNumberOverlayProps> = ({ orderNumber, on
 
         <div className="bg-gray-50 rounded-lg p-4 mb-6">
           <div className="flex items-center justify-between">
-            <span className="text-lg font-semibold text-gray-900">{orderNumber}</span>
+            <span className="text-lg font-semibold text-gray-900 select-all">{orderNumber}</span>
             <Button
               variant="ghost"
               size="sm"

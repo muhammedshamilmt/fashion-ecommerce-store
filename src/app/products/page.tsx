@@ -1,7 +1,6 @@
 'use client'
 import React, { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import ProductCard from "@/components/products/ProductCard";
 import { Product } from "@/utils/data";
@@ -247,7 +246,7 @@ const Products = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar />
+      
       <main className="flex-grow pt-24 pb-16">
         <div className="container mx-auto px-4">
           {/* Header */}

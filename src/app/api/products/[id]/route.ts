@@ -4,21 +4,22 @@ import { ObjectId } from "mongodb";
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { db } = await connectToDatabase();
+    const { id } = await params;
     
     // Validate ObjectId
-    if (!ObjectId.isValid(params.id)) {
+    if (!ObjectId.isValid(id)) {
       return NextResponse.json(
         { success: false, error: "Invalid product ID" },
         { status: 400 }
       );
     }
 
+    const { db } = await connectToDatabase();
     const product = await db.collection("products").findOne({
-      _id: new ObjectId(params.id)
+      _id: new ObjectId(id)
     });
 
     if (!product) {
@@ -33,12 +34,12 @@ export async function GET(
       data: product
     });
   } catch (error) {
-    console.error('Error fetching product:', error);
+    console.error("Error fetching product:", error);
     return NextResponse.json(
       { 
         success: false, 
-        error: 'Failed to fetch product',
-        details: error instanceof Error ? error.message : 'Unknown error'
+        error: "Failed to fetch product",
+        message: error instanceof Error ? error.message : "Unknown error occurred"
       },
       { status: 500 }
     );

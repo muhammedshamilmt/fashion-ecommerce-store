@@ -1,20 +1,38 @@
 import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
+import { ObjectId } from 'mongodb';
 
 export async function GET(
   request: Request,
-  { params }: { params: { trackingNumber: string } }
+  { params }: { params: Promise<{ trackingNumber: string }> }
 ) {
   try {
-    const { db } = await connectToDatabase();
-    const orderNumber = params.trackingNumber; // We're reusing the parameter name for compatibility
+    const { trackingNumber } = await params;
+    
+    if (!trackingNumber) {
+      return NextResponse.json(
+        { success: false, error: 'Tracking number is required' },
+        { status: 400 }
+      );
+    }
 
-    // Find the order with the given order number
-    const order = await db.collection("orders").findOne({ orderNumber });
+    const { db } = await connectToDatabase();
+    
+    // Try to find order by orderNumber (as string or number)
+    const order = await db.collection("orders").findOne({
+      $or: [
+        { orderNumber: trackingNumber },
+        { orderNumber: parseInt(trackingNumber) }
+      ]
+    });
 
     if (!order) {
       return NextResponse.json(
-        { success: false, error: "Order not found" },
+        { 
+          success: false, 
+          error: "Order not found",
+          message: "Please check your order number and try again"
+        },
         { status: 404 }
       );
     }
@@ -23,10 +41,16 @@ export async function GET(
     const trackingInfo = {
       orderId: order._id.toString(),
       orderNumber: order.orderNumber,
-      status: order.status,
-      estimatedDelivery: order.estimatedDelivery,
-      currentLocation: order.currentLocation,
-      history: order.trackingHistory || []
+      status: order.status || 'Processing',
+      estimatedDelivery: order.estimatedDelivery || 'Not available',
+      currentLocation: order.currentLocation || 'Processing at warehouse',
+      history: order.trackingHistory || [
+        {
+          status: 'Order Placed',
+          timestamp: order.createdAt || new Date().toISOString(),
+          location: 'Online Store'
+        }
+      ]
     };
 
     return NextResponse.json({
@@ -36,7 +60,11 @@ export async function GET(
   } catch (error) {
     console.error("Error tracking order:", error);
     return NextResponse.json(
-      { success: false, error: "Failed to track order" },
+      { 
+        success: false, 
+        error: "Failed to track order",
+        message: error instanceof Error ? error.message : "An unexpected error occurred"
+      },
       { status: 500 }
     );
   }

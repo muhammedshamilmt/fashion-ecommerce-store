@@ -18,6 +18,7 @@ const ProductDetail = () => {
   const [product, setProduct] = useState<Product | null>(null);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [userRating, setUserRating] = useState(0);
   const router = useRouter();
   
@@ -26,20 +27,14 @@ const ProductDetail = () => {
       setIsLoading(true);
       try {
         const response = await fetch(`/api/products/${id}`);
-        const result = await response.json();
-
         if (!response.ok) {
-          throw new Error(result.error || 'Failed to fetch product');
+          throw new Error('Failed to fetch product');
         }
-
-        if (!result.success) {
-          throw new Error(result.error || 'Failed to fetch product');
-        }
-
-        setProduct(result.data);
+        const data = await response.json();
+        setProduct(data);
         
         // Fetch related products
-        const relatedResponse = await fetch(`/api/products?category=${result.data.category}&limit=4`);
+        const relatedResponse = await fetch(`/api/products?category=${data.category}&limit=4`);
         const relatedResult = await relatedResponse.json();
 
         if (relatedResult.success) {
@@ -47,9 +42,8 @@ const ProductDetail = () => {
           const related = relatedResult.data.filter((p: Product) => p._id !== id);
           setRelatedProducts(related);
         }
-      } catch (error) {
-        console.error("Error fetching product:", error);
-        toast.error(error instanceof Error ? error.message : 'Failed to fetch product');
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load product');
       } finally {
         setIsLoading(false);
       }
@@ -64,7 +58,7 @@ const ProductDetail = () => {
     router.back();
   };
 
-  const handleRatingChange = (rating: number) => {
+  const handleRatingSubmit = (rating: number) => {
     setUserRating(rating);
     toast.success(`Thank you for rating this product ${rating} stars!`);
   };
@@ -95,15 +89,15 @@ const ProductDetail = () => {
     );
   }
 
-  if (!product) {
+  if (error || !product) {
     return (
       <div className="min-h-screen flex flex-col">
         <Navbar />
         <main className="flex-grow pt-28 pb-16 animate-fade-in">
           <div className="container mx-auto px-4 text-center">
-            <h1 className="text-2xl font-bold text-fashion-primary mb-4">Product Not Found</h1>
+            <h1 className="text-2xl font-bold text-fashion-primary mb-4">Error</h1>
             <p className="text-fashion-primary/70 mb-8">
-              Sorry, we couldn't find the product you're looking for.
+              {error || 'Product not found'}
             </p>
             <Button 
               onClick={handleGoBack} 
@@ -162,7 +156,7 @@ const ProductDetail = () => {
                 <span className="text-fashion-primary/70 mr-4">Your Rating:</span>
                 <Rating 
                   initialValue={userRating} 
-                  onChange={handleRatingChange} 
+                  onChange={handleRatingSubmit} 
                 />
               </div>
               {userRating > 0 && (

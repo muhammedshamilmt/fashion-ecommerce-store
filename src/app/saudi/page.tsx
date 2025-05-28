@@ -7,7 +7,6 @@ import { connectToDatabase } from "@/lib/mongodb";
 import { Product } from "@/utils/data";
 import Footer from "@/components/layout/Footer";
 
-
 async function getSaudiProducts(): Promise<Product[]> {
   try {
     const { db } = await connectToDatabase();

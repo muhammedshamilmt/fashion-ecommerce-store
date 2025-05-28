@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import {
@@ -21,24 +21,12 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
 import { useCart } from "@/contexts/CartContext";
 import OrderNumberOverlay from "./OrderNumberOverlay";
-import { handleRazorpayPayment, createRazorpayOrder } from '@/utils/razorpay';
 
 interface CheckoutFormProps {
   subtotal: number;
-  isDirectPurchase?: boolean;
-  directPurchaseDetails?: {
-    productId: string;
-    quantity: number;
-    size: string;
-    color: string;
-  };
 }
 
-const CheckoutForm: React.FC<CheckoutFormProps> = ({ 
-  subtotal, 
-  isDirectPurchase = false,
-  directPurchaseDetails 
-}) => {
+const CheckoutForm: React.FC<CheckoutFormProps> = ({ subtotal }) => {
   const { items, clearCart } = useCart();
   const router = useRouter();
   const [paymentMethod, setPaymentMethod] = useState("cash_on_delivery");
@@ -46,36 +34,8 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
   const [showOrderNumber, setShowOrderNumber] = useState(false);
   const [orderNumber, setOrderNumber] = useState("");
   const [pendingOrderData, setPendingOrderData] = useState<any>(null);
-  const [product, setProduct] = useState<any>(null);
 
   const { register, handleSubmit, formState: { errors } } = useForm();
-
-  // Fetch product details for direct purchase
-  useEffect(() => {
-    if (isDirectPurchase && directPurchaseDetails) {
-      const fetchProduct = async () => {
-        try {
-          const response = await fetch(`/api/products/${directPurchaseDetails.productId}`);
-          const result = await response.json();
-
-          if (!response.ok) {
-            throw new Error(result.error || 'Failed to fetch product');
-          }
-
-          if (!result.success) {
-            throw new Error(result.error || 'Failed to fetch product');
-          }
-
-          setProduct(result.data);
-        } catch (error) {
-          console.error("Error fetching product:", error);
-          toast.error(error instanceof Error ? error.message : 'Failed to fetch product');
-        }
-      };
-
-      fetchProduct();
-    }
-  }, [isDirectPurchase, directPurchaseDetails]);
 
   const generateOrderNumber = () => {
     const timestamp = Date.now().toString();
@@ -92,163 +52,50 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
       const total = subtotal + shipping + tax;
       const generatedOrderNumber = generateOrderNumber();
 
-      if (paymentMethod === "online_payment") {
-        // Create Razorpay order
-        const orderResponse = await createRazorpayOrder(total);
-        
-        if (!orderResponse.success) {
-          throw new Error('Failed to create payment order');
-        }
-
-        // Handle Razorpay payment
-        await handleRazorpayPayment(
-          orderResponse.data.id,
-          total,
-          async (response) => {
-            try {
-              // Payment successful, create order
-              const orderData = {
-                orderNumber: generatedOrderNumber,
-                customerInfo: {
-                  firstName: data.firstName,
-                  lastName: data.lastName,
-                  email: data.email,
-                  phone: data.phone,
-                  address: data.address,
-                  city: data.city,
-                  state: data.state,
-                  zipCode: data.zipCode,
-                  country: data.country,
-                },
-                paymentDetails: {
-                  razorpay_payment_id: response.razorpay_payment_id,
-                  razorpay_order_id: response.razorpay_order_id,
-                  razorpay_signature: response.razorpay_signature,
-                },
-                items: isDirectPurchase && product ? [{
-                  productId: product._id,
-                  name: product.name,
-                  price: product.price,
-                  quantity: directPurchaseDetails?.quantity || 1,
-                  size: directPurchaseDetails?.size || '',
-                  color: directPurchaseDetails?.color || '',
-                  image: product.images[0],
-                }] : items.map(item => ({
-                  productId: item.product._id,
-                  name: item.product.name,
-                  price: item.product.price,
-                  quantity: item.quantity,
-                  size: item.size,
-                  color: item.color,
-                  image: item.product.images[0],
-                })),
-                subtotal,
-                shipping,
-                tax,
-                total,
-                paymentMethod,
-                status: 'confirmed',
-                currentLocation: 'Processing at warehouse',
-                estimatedDelivery: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-                trackingHistory: [
-                  {
-                    status: 'Payment Confirmed',
-                    location: 'Processing at warehouse',
-                    timestamp: new Date().toISOString()
-                  }
-                ]
-              };
-
-              // Save the order to database
-              const saveResponse = await fetch('/api/orders', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(orderData),
-              });
-
-              const result = await saveResponse.json();
-
-              if (!saveResponse.ok || !result.success) {
-                throw new Error(result.error || 'Failed to create order');
-              }
-
-              // Show success message
-              toast.success('Payment successful! Order placed.');
-              
-              // Clear cart and reset state
-              if (!isDirectPurchase) {
-                clearCart();
-              }
-              setPendingOrderData(null);
-              
-              // Redirect to order confirmation
-              router.push(`/order-confirmation?orderNumber=${generatedOrderNumber}`);
-            } catch (error) {
-              toast.error('Payment successful but failed to create order. Please contact support.');
-              console.error('Error creating order after payment:', error);
-            }
-          },
-          (error) => {
-            toast.error('Payment failed: ' + error);
-            setIsSubmitting(false);
+      const orderData = {
+        orderNumber: generatedOrderNumber,
+        customerInfo: {
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: data.email,
+          phone: data.phone,
+          address: data.address,
+          city: data.city,
+          state: data.state,
+          zipCode: data.zipCode,
+          country: data.country,
+        },
+        items: items.map(item => ({
+          productId: item.product._id,
+          name: item.product.name,
+          price: item.product.price,
+          quantity: item.quantity,
+          size: item.size,
+          color: item.color,
+          image: item.product.images[0],
+        })),
+        subtotal,
+        shipping,
+        tax,
+        total,
+        paymentMethod,
+        status: 'pending',
+        currentLocation: 'Processing at warehouse',
+        estimatedDelivery: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days from now
+        trackingHistory: [
+          {
+            status: 'Order Placed',
+            location: 'Processing at warehouse',
+            timestamp: new Date().toISOString()
           }
-        );
-      } else {
-        // Handle cash on delivery
-        const orderData = {
-          orderNumber: generatedOrderNumber,
-          customerInfo: {
-            firstName: data.firstName,
-            lastName: data.lastName,
-            email: data.email,
-            phone: data.phone,
-            address: data.address,
-            city: data.city,
-            state: data.state,
-            zipCode: data.zipCode,
-            country: data.country,
-          },
-          items: isDirectPurchase && product ? [{
-            productId: product._id,
-            name: product.name,
-            price: product.price,
-            quantity: directPurchaseDetails?.quantity || 1,
-            size: directPurchaseDetails?.size || '',
-            color: directPurchaseDetails?.color || '',
-            image: product.images[0],
-          }] : items.map(item => ({
-            productId: item.product._id,
-            name: item.product.name,
-            price: item.product.price,
-            quantity: item.quantity,
-            size: item.size,
-            color: item.color,
-            image: item.product.images[0],
-          })),
-          subtotal,
-          shipping,
-          tax,
-          total,
-          paymentMethod,
-          status: 'pending',
-          currentLocation: 'Processing at warehouse',
-          estimatedDelivery: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-          trackingHistory: [
-            {
-              status: 'Order Placed',
-              location: 'Processing at warehouse',
-              timestamp: new Date().toISOString()
-            }
-          ]
-        };
+        ]
+      };
 
-        // Store the order data and show overlay
-        setPendingOrderData(orderData);
-        setOrderNumber(generatedOrderNumber);
-        setShowOrderNumber(true);
-      }
+      // Store the order data and show overlay
+      setPendingOrderData(orderData);
+      setOrderNumber(generatedOrderNumber);
+      setShowOrderNumber(true);
+      
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to process order");
       console.error("Error processing order:", error);
@@ -285,9 +132,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
       toast.success("Order placed successfully!");
       
       // Clear cart and reset state
-      if (!isDirectPurchase) {
-        clearCart();
-      }
+      clearCart();
       setPendingOrderData(null);
       setShowOrderNumber(false);
       

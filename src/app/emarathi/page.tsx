@@ -3,12 +3,11 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ProductCard from "@/components/products/ProductCard";
-
+import Navbar from "@/components/layout/Navbar";
 import { connectToDatabase } from "@/lib/mongodb";
 import { Product } from "@/utils/data";
 import { WithId, Document } from "mongodb";
 import Footer from "@/components/layout/Footer";
-
 
 // Loading Skeleton Component
 const LoadingSkeleton = () => {
@@ -30,7 +29,7 @@ const LoadingSkeleton = () => {
 async function getEmarathi(): Promise<Product[]> {
   try {
     const { db } = await connectToDatabase();
-
+    
     const products = await db.collection("products")
       .find({
         category: "Emarathi"
@@ -65,10 +64,10 @@ async function getEmarathi(): Promise<Product[]> {
 
 const EmarathiPage = async () => {
   const emarathiProducts = await getEmarathi();
-
+  
   return (
     <div className="min-h-screen bg-gray-50">
-
+      <Navbar/>
       <div className="container mx-auto py-16 px-4">
         <div className="flex items-center mb-6">
           <Button variant="ghost" size="sm" asChild className="mr-2">
@@ -78,27 +77,27 @@ const EmarathiPage = async () => {
             </Link>
           </Button>
         </div>
-
+        
         <div className="text-center mb-10">
           <h1 className="text-4xl font-bold text-fashion-primary mb-4 font-['Adelone-Serial-Extrabold-Regular']">Emarathi Collection</h1>
           <p className="text-muted-foreground max-w-2xl mx-auto ">
             Discover our exclusive collection of premium Emarathi wear, featuring traditional designs with modern elegance.
           </p>
         </div>
-
+        
         <React.Suspense fallback={<LoadingSkeleton />}>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {emarathiProducts.map((product, index) => (
-              <ProductCard
-                key={product._id}
-                product={product}
-                index={index}
+              <ProductCard 
+                key={product._id} 
+                product={product} 
+                index={index} 
               />
             ))}
           </div>
         </React.Suspense>
       </div>
-      <Footer />
+      <Footer/>
     </div>
   );
 };

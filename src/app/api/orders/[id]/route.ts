@@ -1,34 +1,39 @@
 import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
-import { z } from "zod";
+import { z, type ZodIssue } from "zod";
 import { ObjectId } from "mongodb";
+import type { NextRequest } from 'next/server';
 
 const updateOrderSchema = z.object({
   status: z.enum(["pending", "processing", "shipped", "delivered"]),
 });
 
+type RouteContext = {
+  params: Promise<{ id: string }>;
+};
+
 export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: RouteContext
 ) {
   try {
     const { db } = await connectToDatabase();
-    
-    // Validate ObjectId
-    if (!ObjectId.isValid(params.id)) {
+    const { id } = await context.params;
+
+    if (!ObjectId.isValid(id)) {
       return NextResponse.json(
-        { success: false, error: "Invalid order ID" },
+        { error: "Invalid order ID" },
         { status: 400 }
       );
     }
 
     const order = await db.collection("orders").findOne({
-      _id: new ObjectId(params.id)
+      _id: new ObjectId(id)
     });
 
     if (!order) {
       return NextResponse.json(
-        { success: false, error: "Order not found" },
+        { error: "Order not found" },
         { status: 404 }
       );
     }
@@ -37,40 +42,35 @@ export async function GET(
       success: true,
       data: order
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching order:', error);
     return NextResponse.json(
-      { 
-        success: false, 
-        error: 'Failed to fetch order',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      },
+      { error: 'Failed to fetch order' },
       { status: 500 }
     );
   }
 }
 
 export async function PUT(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: RouteContext
 ) {
   try {
+    const { db } = await connectToDatabase();
+    const { id } = await context.params;
     const body = await request.json();
+    
     const validatedData = updateOrderSchema.parse(body);
 
-    const { db } = await connectToDatabase();
-    
-    // Validate ObjectId
-    if (!ObjectId.isValid(params.id)) {
+    if (!ObjectId.isValid(id)) {
       return NextResponse.json(
-        { success: false, error: "Invalid order ID" },
+        { error: "Invalid order ID" },
         { status: 400 }
       );
     }
 
-    // Update order status
     const result = await db.collection("orders").updateOne(
-      { _id: new ObjectId(params.id) },
+      { _id: new ObjectId(id) },
       { 
         $set: {
           status: validatedData.status,
@@ -81,37 +81,70 @@ export async function PUT(
 
     if (result.matchedCount === 0) {
       return NextResponse.json(
-        { success: false, error: "Order not found" },
+        { error: "Order not found" },
         { status: 404 }
       );
     }
 
-    // Fetch the updated order
     const updatedOrder = await db.collection("orders").findOne({
-      _id: new ObjectId(params.id)
+      _id: new ObjectId(id)
     });
 
     return NextResponse.json({
       success: true,
-      message: "Order status updated successfully",
+      message: "Order updated successfully",
       data: updatedOrder
     });
-  } catch (error) {
-    console.error("Error updating order:", error);
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
+      const errorMessages = error.errors.map((err: ZodIssue) => err.message);
       return NextResponse.json(
-        { success: false, error: error.errors },
+        { error: errorMessages },
         { status: 400 }
       );
     }
-    if (error instanceof Error) {
+    console.error("Error updating order:", error);
+    return NextResponse.json(
+      { error: 'Failed to update order' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(
+  request: NextRequest,
+  context: RouteContext
+) {
+  try {
+    const { db } = await connectToDatabase();
+    const { id } = await context.params;
+
+    if (!ObjectId.isValid(id)) {
       return NextResponse.json(
-        { success: false, error: error.message },
-        { status: 500 }
+        { error: "Invalid order ID" },
+        { status: 400 }
       );
     }
+
+    const result = await db.collection("orders").deleteOne({
+      _id: new ObjectId(id)
+    });
+
+    if (result.deletedCount === 0) {
+      return NextResponse.json(
+        { error: "Order not found" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: "Order deleted successfully"
+    });
+  } catch (error: unknown) {
+    console.error("Error deleting order:", error);
     return NextResponse.json(
-      { success: false, error: "Failed to update order" },
+      { error: 'Failed to delete order' },
       { status: 500 }
     );
   }

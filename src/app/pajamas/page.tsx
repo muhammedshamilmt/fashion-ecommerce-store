@@ -3,11 +3,11 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ProductCard from "@/components/products/ProductCard";
+import Navbar from "@/components/layout/Navbar";
 import { connectToDatabase } from "@/lib/mongodb";
 import { Product } from "@/utils/data";
 import { WithId, Document } from "mongodb";
 import Footer from "@/components/layout/Footer";
-
 
 // Loading Skeleton Component
 const LoadingSkeleton = () => {
@@ -67,6 +67,7 @@ const PajamasPage = async () => {
   
   return (
     <div className="min-h-screen bg-gray-50">
+      <Navbar/>
       <div className="container mx-auto py-16 px-4">
         <div className="flex items-center mb-6">
           <Button variant="ghost" size="sm" asChild className="mr-2">

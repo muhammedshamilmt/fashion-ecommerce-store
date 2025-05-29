@@ -15,15 +15,101 @@ const productSchema = z.object({
   images: z.array(z.string()).min(1, "At least one image is required"),
 });
 
+// Sample boys' thobas products
+const boysThobasProducts = [
+  {
+    _id: new ObjectId().toString(),
+    name: "Classic White Thoba",
+    description: "Traditional white thoba with elegant embroidery, perfect for special occasions.",
+    price: 2499,
+    images: [
+      "https://images.unsplash.com/photo-1617137968427-85924c800a22?q=80&w=2787&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1617137968427-85924c800a22?q=80&w=2787&auto=format&fit=crop",
+    ],
+    category: "boys-thobas",
+    sizes: ["6-7", "8-9", "10-11", "12-13"],
+    colors: ["White", "Cream", "Beige"],
+    inStock: true,
+    featured: true,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    stock: 15,
+    sku: "BT001",
+    material: "Premium Cotton",
+    brand: "Al-Hayba"
+  },
+  {
+    _id: new ObjectId().toString(),
+    name: "Embroidered Black Thoba",
+    description: "Stylish black thoba with gold embroidery, ideal for formal events.",
+    price: 2999,
+    images: [
+      "https://images.unsplash.com/photo-1617137968427-85924c800a22?q=80&w=2787&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1617137968427-85924c800a22?q=80&w=2787&auto=format&fit=crop",
+    ],
+    category: "boys-thobas",
+    sizes: ["6-7", "8-9", "10-11", "12-13"],
+    colors: ["Black", "Navy", "Gray"],
+    inStock: true,
+    featured: true,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    stock: 10,
+    sku: "BT002",
+    material: "Premium Cotton",
+    brand: "Al-Hayba"
+  },
+  {
+    _id: new ObjectId().toString(),
+    name: "Casual Blue Thoba",
+    description: "Comfortable blue thoba for daily wear, made with breathable fabric.",
+    price: 1999,
+    images: [
+      "https://images.unsplash.com/photo-1617137968427-85924c800a22?q=80&w=2787&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1617137968427-85924c800a22?q=80&w=2787&auto=format&fit=crop",
+    ],
+    category: "boys-thobas",
+    sizes: ["6-7", "8-9", "10-11", "12-13"],
+    colors: ["Blue", "Light Blue", "Navy"],
+    inStock: true,
+    featured: false,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    stock: 20,
+    sku: "BT003",
+    material: "Cotton Blend",
+    brand: "Al-Hayba"
+  },
+  {
+    _id: new ObjectId().toString(),
+    name: "Premium Silk Thoba",
+    description: "Luxurious silk thoba with intricate patterns, perfect for weddings.",
+    price: 3999,
+    images: [
+      "https://images.unsplash.com/photo-1617137968427-85924c800a22?q=80&w=2787&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1617137968427-85924c800a22?q=80&w=2787&auto=format&fit=crop",
+    ],
+    category: "boys-thobas",
+    sizes: ["6-7", "8-9", "10-11", "12-13"],
+    colors: ["White", "Gold", "Silver"],
+    inStock: true,
+    featured: true,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    stock: 8,
+    sku: "BT004",
+    material: "Pure Silk",
+    brand: "Al-Hayba"
+  }
+];
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const validatedData = productSchema.parse(body);
-
     const { db } = await connectToDatabase();
     
     const product = {
-      ...validatedData,
+      ...body,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -32,22 +118,14 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       success: true,
-      data: { ...product, _id: result.insertedId },
+      message: "Product created successfully",
+      data: {
+        ...product,
+        _id: result.insertedId
+      }
     });
   } catch (error) {
     console.error("Error creating product:", error);
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { success: false, error: error.errors },
-        { status: 400 }
-      );
-    }
-    if (error instanceof Error) {
-      return NextResponse.json(
-        { success: false, error: error.message },
-        { status: 500 }
-      );
-    }
     return NextResponse.json(
       { success: false, error: "Failed to create product" },
       { status: 500 }
@@ -117,22 +195,15 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const category = searchParams.get('category');
-    const featured = searchParams.get('featured');
 
     const { db } = await connectToDatabase();
     
-    // Build query
+    // Build query based on category
     const query: any = {};
-    if (category && category !== 'all') {
-      // Handle specific categories
-      if (category === 'Mens Thobas' || category === 'Kids Thobas' || category === 'Turban & Caps' || category === 'Pajamas' || category === 'Emarathi') {
-        query.category = category;
-      } else {
+    if (category === 'boys-thobas') {
+      query.category = 'Boys Thobas'; // Match the exact category name in the database
+    } else if (category) {
       query.category = category;
-      }
-    }
-    if (featured === 'true') {
-      query.featured = true;
     }
 
     const products = await db.collection("products")
@@ -145,7 +216,7 @@ export async function GET(request: Request) {
       data: products
     });
   } catch (error) {
-    console.error('Error fetching products:', error);
+    console.error("Error fetching products:", error);
     return NextResponse.json(
       { 
         success: false, 

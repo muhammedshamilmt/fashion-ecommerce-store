@@ -30,17 +30,27 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Load cart from localStorage on mount
   useEffect(() => {
     const savedCart = localStorage.getItem('cart');
+    console.log('Loading cart from localStorage:', savedCart); // Debug log
     if (savedCart) {
-      setItems(JSON.parse(savedCart));
+      try {
+        const parsedCart = JSON.parse(savedCart);
+        console.log('Parsed cart:', parsedCart); // Debug log
+        setItems(parsedCart);
+      } catch (error) {
+        console.error('Error parsing cart from localStorage:', error);
+        localStorage.removeItem('cart'); // Clear invalid cart data
+      }
     }
   }, []);
 
   // Save cart to localStorage whenever it changes
   useEffect(() => {
+    console.log('Saving cart to localStorage:', items); // Debug log
     localStorage.setItem('cart', JSON.stringify(items));
   }, [items]);
 
   const addItem = (product: Product, quantity: number, size: string, color: string) => {
+    console.log('Adding item to cart:', { product, quantity, size, color }); // Debug log
     setItems(currentItems => {
       // Check if item already exists with same size and color
       const existingItemIndex = currentItems.findIndex(
@@ -57,13 +67,16 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
           ...updatedItems[existingItemIndex],
           quantity: updatedItems[existingItemIndex].quantity + quantity
         };
+        console.log('Updated cart items:', updatedItems); // Debug log
         toast.success(`Updated quantity in cart`);
         return updatedItems;
       }
 
       // Add new item if it doesn't exist
+      const newItems = [...currentItems, { product, quantity, size, color }];
+      console.log('New cart items:', newItems); // Debug log
       toast.success(`Added to cart`);
-      return [...currentItems, { product, quantity, size, color }];
+      return newItems;
     });
   };
 

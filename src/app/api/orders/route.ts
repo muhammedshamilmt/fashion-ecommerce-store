@@ -4,7 +4,13 @@ import { z } from "zod";
 import { ObjectId } from "mongodb";
 
 const orderItemSchema = z.object({
-  productId: z.string(),
+  productId: z.string().transform(val => {
+    try {
+      return new ObjectId(val);
+    } catch (error) {
+      return val; // Keep the original string if not a valid ObjectId
+    }
+  }),
   name: z.string(),
   price: z.number(),
   quantity: z.number(),
@@ -84,7 +90,10 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
+    console.log('Received order data:', body); // Debug log
+
     const validatedData = orderSchema.parse(body);
+    console.log('Validated order data:', validatedData); // Debug log
 
     const { db } = await connectToDatabase();
     
@@ -107,12 +116,16 @@ export async function POST(request: Request) {
       updatedAt: new Date(),
     };
 
+    console.log('Saving order:', order); // Debug log
+
     const result = await db.collection("orders").insertOne(order);
 
     // Fetch the created order
     const createdOrder = await db.collection("orders").findOne({
       _id: result.insertedId
     });
+
+    console.log('Created order:', createdOrder); // Debug log
 
     return NextResponse.json({
       success: true,
@@ -122,6 +135,7 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error("Error creating order:", error);
     if (error instanceof z.ZodError) {
+      console.error("Validation errors:", error.errors); // Debug log
       return NextResponse.json(
         { success: false, error: error.errors },
         { status: 400 }

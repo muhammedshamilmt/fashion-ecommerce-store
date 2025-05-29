@@ -66,7 +66,7 @@ interface ProductFormProps {
 
 const availableSizes = ["XS", "S", "M", "L", "XL", "XXL", "30", "32", "34", "36", "38", "40", "42", "44"];
 const availableColors = ["Black", "White", "Red", "Blue", "Green", "Yellow", "Brown", "Gray", "Navy", "Pink", "Purple", "Orange", "Beige", "Tan", "Charcoal"];
-const availableCategories = ["Mens Thobas","Kids Thobas", "Turban & Caps", "Pajamas","Emarathi","Saudi","Omani","Morocan"];
+const availableCategories = ["Mens Thobas","Kids Thobas", "Turban & Caps", "Boys Thobas", "Pajamas","Emarathi","Saudi","Omani","Morocan"];
 
 // Sample placeholder images
 const placeholderImages = [

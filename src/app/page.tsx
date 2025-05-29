@@ -17,12 +17,17 @@ const Index = () => {
 
         <section className="py-16">
           <div className="container px-4 mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {[
                 {
                   title: "Mens",
                   image: "https://www.alkameez.com/cdn/shop/files/2_9340c8cd-c2a4-43a3-ae09-c3a0cc0455b4.png?v=1747737108&width=720",
                   link: "/mensthobas"
+                },
+                {
+                  title: "Boys",
+                  image: "https://www.alkameez.com/cdn/shop/files/1_a07ff1e0-9bb1-4068-b293-9f80208b52f0.png?v=1747737307&width=720",
+                  link: "/boys-thobas"
                 },
                 {
                   title: "Kids",

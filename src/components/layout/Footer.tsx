@@ -16,6 +16,7 @@ const Footer = () => {
     phoneNumber: '',
     contactEmail: ''
   });
+  const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -24,11 +25,18 @@ const Footer = () => {
         const response = await fetch('/api/settings');
         const result = await response.json();
         
-        if (result.success) {
-          setContactInfo(result.data);
+        if (result.success && result.data) {
+          setContactInfo({
+            storeAddress: result.data.storeAddress || '',
+            phoneNumber: result.data.contactPhone || '',
+            contactEmail: result.data.contactEmail || ''
+          });
+        } else {
+          setError('Failed to load contact information');
         }
       } catch (error) {
         console.error('Error fetching settings:', error);
+        setError('Failed to load contact information');
       } finally {
         setIsLoading(false);
       }
@@ -114,25 +122,25 @@ const Footer = () => {
               <li className="flex items-start space-x-2">
                 <MapPin size={20} className="mt-1 flex-shrink-0" />
                 <span className="text-gray-300">
-                  {isLoading ? 'Loading...' : contactInfo.storeAddress || 'Address not available'}
+                  {isLoading ? 'Loading...' : contactInfo?.storeAddress || 'Address not available'}
                 </span>
               </li>
               <li className="flex items-center space-x-2">
                 <Phone size={20} className="flex-shrink-0" />
                 <a 
-                  href={`tel:${contactInfo.phoneNumber}`} 
+                  href={`tel:${contactInfo?.phoneNumber}`} 
                   className="text-gray-300 hover:text-[#3FB185] transition-colors duration-300"
                 >
-                  {isLoading ? 'Loading...' : contactInfo.phoneNumber || 'Phone not available'}
+                  {isLoading ? 'Loading...' : contactInfo?.phoneNumber || 'Phone not available'}
                 </a>
               </li>
               <li className="flex items-center space-x-2">
                 <Mail size={20} className="flex-shrink-0" />
                 <a 
-                  href={`mailto:${contactInfo.contactEmail}`} 
+                  href={`mailto:${contactInfo?.contactEmail}`} 
                   className="text-gray-300 hover:text-[#3FB185] transition-colors duration-300"
                 >
-                  {isLoading ? 'Loading...' : contactInfo.contactEmail || 'Email not available'}
+                  {isLoading ? 'Loading...' : contactInfo?.contactEmail || 'Email not available'}
                 </a>
               </li>
               <li className="flex items-center space-x-2">

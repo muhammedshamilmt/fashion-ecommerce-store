@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import {
@@ -34,8 +34,23 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ subtotal }) => {
   const [showOrderNumber, setShowOrderNumber] = useState(false);
   const [orderNumber, setOrderNumber] = useState("");
   const [pendingOrderData, setPendingOrderData] = useState<any>(null);
+  const [directPurchaseItem, setDirectPurchaseItem] = useState<any>(null);
 
   const { register, handleSubmit, formState: { errors } } = useForm();
+
+  useEffect(() => {
+    // Check for direct purchase item in sessionStorage
+    const savedItem = sessionStorage.getItem('checkoutItem');
+    if (savedItem) {
+      try {
+        const parsedItem = JSON.parse(savedItem);
+        console.log('Direct purchase item:', parsedItem);
+        setDirectPurchaseItem(parsedItem);
+      } catch (error) {
+        console.error('Error parsing direct purchase item:', error);
+      }
+    }
+  }, []);
 
   const generateOrderNumber = () => {
     const timestamp = Date.now().toString();
@@ -47,9 +62,62 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ subtotal }) => {
     try {
       setIsSubmitting(true);
 
+      // Calculate totals based on whether it's a direct purchase or cart checkout
+      let orderItems;
+      let calculatedSubtotal;
+      
+      if (directPurchaseItem) {
+        // Direct purchase
+        orderItems = [{
+          productId: directPurchaseItem.product._id.toString(),
+          name: directPurchaseItem.product.name,
+          price: directPurchaseItem.product.price,
+          quantity: directPurchaseItem.quantity,
+          size: directPurchaseItem.size,
+          color: directPurchaseItem.color,
+          image: directPurchaseItem.product.images[0],
+        }];
+        calculatedSubtotal = directPurchaseItem.product.price * directPurchaseItem.quantity;
+      } else {
+        // Cart checkout
+        // Validate cart items
+        if (!items || items.length === 0) {
+          toast.error("Your cart is empty");
+          return;
+        }
+
+        // Validate each item has required properties
+        const invalidItems = items.filter(item => 
+          !item.product?._id || 
+          !item.product?.name || 
+          !item.product?.price || 
+          !item.quantity || 
+          !item.size || 
+          !item.color || 
+          !item.product?.images?.[0]
+        );
+
+        if (invalidItems.length > 0) {
+          console.error('Invalid items found:', invalidItems);
+          toast.error("Some items in your cart are invalid. Please try adding them again.");
+          return;
+        }
+
+        orderItems = items.map(item => ({
+          productId: item.product._id.toString(),
+          name: item.product.name,
+          price: item.product.price,
+          quantity: item.quantity,
+          size: item.size,
+          color: item.color,
+          image: item.product.images[0],
+        }));
+        calculatedSubtotal = subtotal;
+      }
+
       const shipping = 10;
-      const tax = subtotal * 0.07;
-      const total = subtotal + shipping + tax;
+      const tax = calculatedSubtotal * 0.07;
+      const total = calculatedSubtotal + shipping + tax;
       const generatedOrderNumber = generateOrderNumber();
 
       const orderData = {
@@ -65,23 +133,15 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ subtotal }) => {
           zipCode: data.zipCode,
           country: data.country,
         },
-        items: items.map(item => ({
-          productId: item.product._id,
-          name: item.product.name,
-          price: item.product.price,
-          quantity: item.quantity,
-          size: item.size,
-          color: item.color,
-          image: item.product.images[0],
-        })),
-        subtotal,
+        items: orderItems,
+        subtotal: calculatedSubtotal,
         shipping,
         tax,
         total,
         paymentMethod,
         status: 'pending',
         currentLocation: 'Processing at warehouse',
-        estimatedDelivery: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days from now
+        estimatedDelivery: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
         trackingHistory: [
           {
             status: 'Order Placed',
@@ -108,6 +168,9 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ subtotal }) => {
     try {
       if (!pendingOrderData) return;
 
+      // Debug log
+      console.log('Sending order data:', pendingOrderData);
+
       // Save the order to database
       const response = await fetch('/api/orders', {
         method: 'POST',
@@ -118,6 +181,9 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ subtotal }) => {
       });
 
       const result = await response.json();
+      
+      // Debug log
+      console.log('API response:', result);
 
       if (!response.ok) {
         const errorMessage = result.error || result.details || "Failed to create order";
@@ -131,8 +197,14 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ subtotal }) => {
       // Show success message
       toast.success("Order placed successfully!");
       
-      // Clear cart and reset state
-      clearCart();
+      if (directPurchaseItem) {
+        // Clear direct purchase item
+        sessionStorage.removeItem('checkoutItem');
+      } else {
+        // Clear cart only for cart checkout
+        clearCart();
+      }
+
       setPendingOrderData(null);
       setShowOrderNumber(false);
       

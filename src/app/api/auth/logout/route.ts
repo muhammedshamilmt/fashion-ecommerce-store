@@ -30,10 +30,6 @@ export async function POST() {
       sameSite: 'strict'
     });
 
-    // Delete the cookie from the store
-    cookieStore.delete('adminSession');
-    cookieStore.delete('session');
-
     return response;
   } catch (error) {
     console.error('Logout error:', error);

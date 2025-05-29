@@ -1,13 +1,17 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { User as BaseUser, users } from "../utils/data";
+import { users } from "../utils/data";
 import { toast } from "sonner";
 import { useRouter } from 'next/navigation';
 
-// Extend the User type to include photoURL and role
-interface User extends BaseUser {
+// Define and export the User interface
+export interface User {
+  id: string;
+  name: string;
+  email: string;
   photoURL?: string;
   role: string;
+  isAdmin: boolean;
 }
 
 interface AuthContextType {

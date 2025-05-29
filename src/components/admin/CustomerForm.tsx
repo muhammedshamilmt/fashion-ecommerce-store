@@ -30,8 +30,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 const customerSchema = z.object({
   name: z.string().min(1, "Name is required"),
   email: z.string().email("Invalid email address"),
-  isAdmin: z.boolean().default(false),
-  photoURL: z.string().optional(),
+  isAdmin: z.boolean(),
+  photoURL: z.string(),
 });
 
 type CustomerFormValues = z.infer<typeof customerSchema>;
@@ -67,8 +67,8 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
   const handleSubmit: SubmitHandler<CustomerFormValues> = async (data) => {
     try {
       await onSubmit(data);
-    onOpenChange(false);
-    toast.success("Customer added successfully");
+      onOpenChange(false);
+      toast.success("Customer added successfully");
     } catch (error) {
       toast.error("Failed to add customer");
       console.error("Error adding customer:", error);

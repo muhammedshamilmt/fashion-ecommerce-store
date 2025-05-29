@@ -40,7 +40,7 @@ const Footer = () => {
   return (
     <footer className="bg-[#2B3972] text-white">
       <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Company Info */}
           <div className="space-y-4">
             <h3 className="text-2xl font-['Adelone-Serial-Extrabold-Regular'] text-white tracking-tight">AL-HAYBA</h3>
@@ -80,6 +80,28 @@ const Footer = () => {
               <li>
                 <Link href="/admin" className="text-gray-300 hover:text-[#3FB185] transition-colors duration-300">
                   Admin 
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Quick Links */}
+          <div className="space-y-4">
+            <h3 className="text-xl font-semibold">Support</h3>
+            <ul className="space-y-2">
+              <li>
+                <Link href="/privacypolicy" className="text-gray-300 hover:text-[#3FB185] transition-colors duration-300">
+                  privacy and policy
+                </Link>
+              </li>
+              <li>
+                <Link href="/contact" className="text-gray-300 hover:text-[#3FB185] transition-colors duration-300">
+                Terms of Service
+                </Link>
+              </li>
+              <li>
+                <Link href="/admin" className="text-gray-300 hover:text-[#3FB185] transition-colors duration-300">
+                Refund and Return Policy
                 </Link>
               </li>
             </ul>

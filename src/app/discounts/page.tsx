@@ -5,6 +5,7 @@ import { ArrowLeft, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { products } from "@/utils/data";
 import ProductCard from "@/components/products/ProductCard";
+import { Product } from "@/types/product";
 
 const Discounts = () => {
   // Filter products with a discount (assuming products might have a discountPercentage property)
@@ -34,7 +35,7 @@ const Discounts = () => {
         
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {discountedProducts.map((product, index) => (
-            <ProductCard key={product.id} product={product} index={index} />
+            <ProductCard key={product._id} product={product} index={index} />
           ))}
         </div>
       </div>

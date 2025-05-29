@@ -71,18 +71,19 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
     if (!validateForm()) return;
 
     try {
-      let success = false;
       if (mode === "login") {
-        success = await login(formData.email, formData.password);
+        await login(formData.email, formData.password);
+        router.push(from);
       } else {
-        success = await signup(formData.name, formData.email, formData.password);
-      }
-
-      if (success) {
-        router.push(from, { replace: true });
+        await signup(formData.name, formData.email, formData.password);
+        router.push(from);
       }
     } catch (error) {
       console.error("Authentication error:", error);
+      setErrors(prev => ({
+        ...prev,
+        submit: "Authentication failed. Please try again."
+      }));
     }
   };
 
@@ -187,6 +188,12 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
             <a href="#" className="text-sm text-blue-600 hover:text-blue-800">
               Forgot your password?
             </a>
+          </div>
+        )}
+
+        {errors.submit && (
+          <div className="text-sm text-red-600 text-center">
+            {errors.submit}
           </div>
         )}
 

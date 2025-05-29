@@ -1,7 +1,6 @@
-'use client'  
 import React from "react";
 import { ChevronLeft } from "lucide-react";
-import Link from "next/link";
+import  Link  from "next/link";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
@@ -14,7 +13,7 @@ const Terms = () => {
         <div className="container mx-auto px-4">
           <div className="mb-6">
             <Button variant="ghost" size="sm" asChild className="mb-4">
-                <Link href="/" className="flex items-center">
+              <Link href="/" className="flex items-center">
                 <ChevronLeft className="mr-2 h-4 w-4" />
                 Back to Home
               </Link>

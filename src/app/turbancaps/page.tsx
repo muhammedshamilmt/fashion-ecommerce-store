@@ -7,6 +7,9 @@ import Navbar from "@/components/layout/Navbar";
 import { connectToDatabase } from "@/lib/mongodb";
 import { Product } from "@/utils/data";
 import Footer from "@/components/layout/Footer";
+import { Metadata } from 'next';
+import ProductGrid from '@/components/ProductGrid';
+import { getProducts } from '@/lib/api';
 
 // Constants
 const ITEMS_PER_PAGE = 12;
@@ -37,13 +40,13 @@ const mapProduct = (product: any): Product => ({
       sizes: product.sizes,
       colors: product.colors,
       inStock: product.inStock,
-      featured: product.featured,
+      featured: product.featured || false,
       createdAt: product.createdAt,
-  updatedAt: product.updatedAt,
-  stock: product.stock || 0,
-  sku: product.sku || '',
-  material: product.material || '',
-  brand: product.brand || ''
+      updatedAt: product.updatedAt,
+      stock: product.stock || 0,
+      sku: product.sku || '',
+      material: product.material || '',
+      brand: product.brand || ''
 });
 
 async function getTurbanCaps(page: number = 1): Promise<{ products: Product[], total: number }> {
@@ -73,15 +76,21 @@ async function getTurbanCaps(page: number = 1): Promise<{ products: Product[], t
   }
 }
 
-const TurbancapsPage = async ({
-  searchParams,
-}: {
-  searchParams: { page?: string };
-}) => {
-  const page = Number(searchParams.page) || 1;
-  const { products: turbancapsProducts, total } = await getTurbanCaps(page);
-  const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
-  
+export const metadata: Metadata = {
+  title: 'Turban Caps - FashionFit',
+  description: 'Discover our collection of premium turban caps, perfect for any occasion.',
+};
+
+interface PageProps {
+  params: Promise<{ [key: string]: string | string[] | undefined }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}
+
+export default async function TurbanCapsPage({ searchParams }: PageProps) {
+  const resolvedSearchParams = await searchParams;
+  const page = typeof resolvedSearchParams.page === 'string' ? parseInt(resolvedSearchParams.page) : 1;
+  const { products, total } = await getTurbanCaps(page);
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
@@ -105,20 +114,12 @@ const TurbancapsPage = async ({
         </div>
         
         <React.Suspense fallback={<LoadingSkeleton />}>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {turbancapsProducts.map((product, index) => (
-            <ProductCard 
-              key={product._id} 
-              product={product} 
-              index={index} 
-            />
-          ))}
-        </div>
-
+          <ProductGrid products={products} />
+          
           {/* Pagination */}
-          {totalPages > 1 && (
+          {total > ITEMS_PER_PAGE && (
             <div className="flex justify-center mt-8 gap-2">
-              {Array.from({ length: totalPages }).map((_, i) => (
+              {Array.from({ length: Math.ceil(total / ITEMS_PER_PAGE) }).map((_, i) => (
                 <Button
                   key={i}
                   variant={page === i + 1 ? "default" : "outline"}
@@ -136,6 +137,4 @@ const TurbancapsPage = async ({
       <Footer />
     </div>
   );
-};
-
-export default TurbancapsPage;
+}

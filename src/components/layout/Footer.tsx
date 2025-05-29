@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { MapPin, Phone, Mail, Facebook, Twitter, Instagram, Youtube } from "lucide-react";
+import { MapPin, Phone, Mail, Facebook, Twitter, Instagram, Youtube, MessageCircle } from "lucide-react";
 
 interface ContactInfo {
   storeAddress: string;
@@ -85,7 +85,7 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Quick Links */}
+          {/* Support */}
           <div className="space-y-4">
             <h3 className="text-xl font-semibold">Support</h3>
             <ul className="space-y-2">
@@ -135,12 +135,23 @@ const Footer = () => {
                   {isLoading ? 'Loading...' : contactInfo.contactEmail || 'Email not available'}
                 </a>
               </li>
+              <li className="flex items-center space-x-2">
+                <MessageCircle size={20} className="flex-shrink-0" />
+                <a
+                  href={`https://wa.me/+91`} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-gray-300 hover:text-[#3FB185] transition-colors duration-300"
+                >
+                  {isLoading ? 'Loading...' : 'Chat on WhatsApp'}
+                </a>
+              </li>
             </ul>
           </div>
         </div>
 
-        <div className="border-t border-white/10 mt-12 pt-8 text-center flex justify-center text-gray-300">
-          <p className=" font-['Adelone-Serial-Extrabold-Regular'] text-white ">&copy; {new Date().getFullYear()} AL-HYABA. </p>
+        <div className="border-t border-white/10 mt-12 pt-8 text-center flex justify-center text-gray-300 space-x-2">
+          <p className="font-['Adelone-Serial-Extrabold-Regular'] text-white">&copy; {new Date().getFullYear()} AL-HYABA.</p>
           <p>All rights reserved.</p>
         </div>
       </div>

@@ -1,94 +1,111 @@
+"use client";
 import React from "react";
 import { ChevronLeft } from "lucide-react";
-import  Link  from "next/link";
+import Link from "next/link";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 
-const Terms = () => {
+const TermsAndConditions = () => {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-gray-50">
       <Navbar />
       <main className="flex-grow pt-20 pb-16">
         <div className="container mx-auto px-4">
-          <div className="mb-6">
+          {/* Header Section */}
+          <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-sm p-8 mb-8">
             <Button variant="ghost" size="sm" asChild className="mb-4">
-              <Link href="/" className="flex items-center">
+              <Link href="/" className="flex items-center text-[#2B3972] hover:text-[#2B3972]/80">
                 <ChevronLeft className="mr-2 h-4 w-4" />
                 Back to Home
               </Link>
             </Button>
-            <h1 className="text-3xl font-bold text-fashion-primary mb-8">Terms & Conditions</h1>
-          </div>
-
-          <div className="prose max-w-none">
-            <p className="text-fashion-primary/80 mb-6">
+            <h1 className="text-3xl font-bold text-[#2B3972] mb-4">Terms and Conditions</h1>
+            <p className="text-[#2B3972]/60">
               Last Updated: {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
             </p>
+          </div>
 
-            <h2 className="text-xl font-semibold mb-4">1. Introduction</h2>
-            <p className="mb-4">
-              Welcome to FashionFit ("Company", "we", "our", "us")! These Terms & Conditions ("Terms", "Terms & Conditions") govern your use of our website located at fashionfit.com (together or individually "Service") operated by FashionFit.
-            </p>
-            <p className="mb-6">
-              Our Privacy Policy also governs your use of our Service and explains how we collect, safeguard and disclose information that results from your use of our web pages. Please read it here.
-            </p>
+          {/* Main Content */}
+          <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-sm p-8">
 
-            <h2 className="text-xl font-semibold mb-4">2. Acceptance of Terms</h2>
-            <p className="mb-6">
-              By accessing or using the Service, you agree to be bound by these Terms. If you disagree with any part of the terms, then you may not access the Service.
-            </p>
+            {/* 1. Agreement to Terms */}
+            <div className="mb-8">
+              <h2 className="text-2xl font-semibold text-[#2B3972] mb-4">1. Agreement to Terms</h2>
+              <div className="bg-gray-50 p-4 rounded-lg text-[#2B3972]/80 leading-relaxed">
+                By accessing or using our services, you agree to be bound by these Terms and Conditions. If you do not agree, please do not use our services.
+              </div>
+            </div>
 
-            <h2 className="text-xl font-semibold mb-4">3. Use of Our Service</h2>
-            <p className="mb-4">
-              You must be at least 18 years old to use our Service. By using our Service and by agreeing to these Terms, you warrant and represent that you are at least 18 years of age.
-            </p>
-            <p className="mb-6">
-              When you create an account with us, you must provide us with information that is accurate, complete, and current at all times. Failure to do so constitutes a breach of the Terms, which may result in immediate termination of your account on our Service.
-            </p>
+            {/* 2. Intellectual Property Rights */}
+            <div className="mb-8">
+              <h2 className="text-2xl font-semibold text-[#2B3972] mb-4">2. Intellectual Property Rights</h2>
+              <div className="bg-gray-50 p-4 rounded-lg text-[#2B3972]/80 leading-relaxed">
+                All content, trademarks, logos, and service marks displayed on the site are our property or the property of third parties. You are granted a limited license to access and use the site for personal, non-commercial use.
+              </div>
+            </div>
 
-            <h2 className="text-xl font-semibold mb-4">4. Account Registration</h2>
-            <p className="mb-4">
-              To use certain features of our Service, you may be required to register for an account. You are responsible for maintaining the confidentiality of your account and password, including but not limited to the restriction of access to your computer and/or account.
-            </p>
-            <p className="mb-6">
-              You agree to accept responsibility for any and all activities or actions that occur under your account and/or password. You must notify us immediately upon becoming aware of any breach of security or unauthorized use of your account.
-            </p>
+            {/* 3. User Representations */}
+            <div className="mb-8">
+              <h2 className="text-2xl font-semibold text-[#2B3972] mb-4">3. User Representations</h2>
+              <div className="bg-gray-50 p-4 rounded-lg text-[#2B3972]/80 leading-relaxed">
+                By using the site, you represent that you have the legal capacity to enter into these Terms, and you will comply with these Terms at all times.
+              </div>
+            </div>
 
-            <h2 className="text-xl font-semibold mb-4">5. Intellectual Property</h2>
-            <p className="mb-6">
-              The Service and its original content (excluding content provided by users), features, and functionality are and will remain the exclusive property of FashionFit and its licensors. The Service is protected by copyright, trademark, and other laws of both the United States and foreign countries. Our trademarks and trade dress may not be used in connection with any product or service without the prior written consent of FashionFit.
-            </p>
+            {/* 4. Prohibited Activities */}
+            <div className="mb-8">
+              <h2 className="text-2xl font-semibold text-[#2B3972] mb-4">4. Prohibited Activities</h2>
+              <div className="bg-gray-50 p-4 rounded-lg text-[#2B3972]/80 leading-relaxed">
+                You may not access or use the site for any purpose other than that for which we make the site available. Prohibited activities include but are not limited to: reverse engineering, unauthorized framing, or copying of content.
+              </div>
+            </div>
 
-            <h2 className="text-xl font-semibold mb-4">6. Links to Other Websites</h2>
-            <p className="mb-6">
-              Our Service may contain links to third-party websites or services that are not owned or controlled by FashionFit. FashionFit has no control over, and assumes no responsibility for, the content, privacy policies, or practices of any third-party websites or services.
-            </p>
+            {/* 5. User-Generated Contributions */}
+            <div className="mb-8">
+              <h2 className="text-2xl font-semibold text-[#2B3972] mb-4">5. User-Generated Contributions</h2>
+              <div className="bg-gray-50 p-4 rounded-lg text-[#2B3972]/80 leading-relaxed">
+                You are solely responsible for any content you contribute. By posting, you grant us the right to use and distribute your content in connection with the site.
+              </div>
+            </div>
 
-            <h2 className="text-xl font-semibold mb-4">7. Termination</h2>
-            <p className="mb-6">
-              We may terminate or suspend your account immediately, without prior notice or liability, for any reason whatsoever, including without limitation if you breach the Terms. Upon termination, your right to use the Service will immediately cease.
-            </p>
+            {/* 6. Site Management */}
+            <div className="mb-8">
+              <h2 className="text-2xl font-semibold text-[#2B3972] mb-4">6. Site Management</h2>
+              <div className="bg-gray-50 p-4 rounded-lg text-[#2B3972]/80 leading-relaxed">
+                We reserve the right to monitor the site for violations of these Terms, and take legal action if necessary. We may also restrict or terminate your access without notice.
+              </div>
+            </div>
 
-            <h2 className="text-xl font-semibold mb-4">8. Limitation of Liability</h2>
-            <p className="mb-6">
-              In no event shall FashionFit, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from your access to or use of or inability to access or use the Service.
-            </p>
+            {/* 7. Modifications and Interruptions */}
+            <div className="mb-8">
+              <h2 className="text-2xl font-semibold text-[#2B3972] mb-4">7. Modifications and Interruptions</h2>
+              <div className="bg-gray-50 p-4 rounded-lg text-[#2B3972]/80 leading-relaxed">
+                We reserve the right to change, modify, or remove content at any time. We are not liable for any interruptions or errors in service.
+              </div>
+            </div>
 
-            <h2 className="text-xl font-semibold mb-4">9. Changes to Terms</h2>
-            <p className="mb-6">
-              We reserve the right, at our sole discretion, to modify or replace these Terms at any time. If a revision is material, we will try to provide at least 30 days' notice prior to any new terms taking effect. What constitutes a material change will be determined at our sole discretion.
-            </p>
+            {/* 8. Governing Law */}
+            <div className="mb-8">
+              <h2 className="text-2xl font-semibold text-[#2B3972] mb-4">8. Governing Law</h2>
+              <div className="bg-gray-50 p-4 rounded-lg text-[#2B3972]/80 leading-relaxed">
+                These Terms shall be governed by and defined following the laws of the country in which our company is registered.
+              </div>
+            </div>
 
-            <h2 className="text-xl font-semibold mb-4">10. Contact Us</h2>
-            <p className="mb-4">
-              If you have any questions about these Terms, please contact us at:
-            </p>
-            <ul className="list-disc pl-5 mb-6">
-              <li>Email: legal@fashionfit.com</li>
-              <li>Phone: +1 (234) 567-890</li>
-              <li>Address: 123 Fashion Street, Design District, New York, NY 10001</li>
-            </ul>
+            {/* 9. Contact Us */}
+            <div className="mb-8">
+              <h2 className="text-2xl font-semibold text-[#2B3972] mb-4">9. Contact Us</h2>
+              <div className="bg-gray-50 p-4 rounded-lg text-[#2B3972]/80 leading-relaxed">
+                If you have any questions or complaints regarding these Terms and Conditions, please contact us at:
+                <div className="mt-4">
+                  FashionFit<br />
+                  123 Fashion Street, Design District<br />
+                  New York, NY 10001<br />
+                  Email: terms@fashionfit.com
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </main>
@@ -97,4 +114,4 @@ const Terms = () => {
   );
 };
 
-export default Terms;
+export default TermsAndConditions;

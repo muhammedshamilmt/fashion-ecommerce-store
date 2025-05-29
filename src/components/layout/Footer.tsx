@@ -95,12 +95,12 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link href="/contact" className="text-gray-300 hover:text-[#3FB185] transition-colors duration-300">
+                <Link href="/terms" className="text-gray-300 hover:text-[#3FB185] transition-colors duration-300">
                 Terms of Service
                 </Link>
               </li>
               <li>
-                <Link href="/admin" className="text-gray-300 hover:text-[#3FB185] transition-colors duration-300">
+                <Link href="/refundandreturn" className="text-gray-300 hover:text-[#3FB185] transition-colors duration-300">
                 Refund and Return Policy
                 </Link>
               </li>

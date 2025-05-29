@@ -99,7 +99,7 @@ const FeaturedCollection = async () => {
 
         <React.Suspense fallback={<LoadingSkeleton />}>
           {featuredProducts.length > 0 ? (
-            <FeaturedProductsGrid products={featuredProducts} />
+          <FeaturedProductsGrid products={featuredProducts} />
           ) : (
             <div className="text-center py-12">
               <p className="text-fashion-primary/60">No featured products available at the moment.</p>

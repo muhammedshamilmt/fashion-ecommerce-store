@@ -1,19 +1,26 @@
-# BSNL Super Wifi Vision
+# AL-HAYBA
 
-A modern web application built with Reactjs and vite for advertise the the services.
+A sleek and modern fashion e-commerce web application built using **Next.js** to showcase, shop, and manage elegant collections with speed and style.
 
 ##  🚀 Features
-  - **Static**:Dont have back end 
+ 
+- **Dynamic + Static Rendering**: Built with hybrid architecture using Next.js
   
-  - **Responcive**: it gives us better experence in all devices like mobile,tablet and dektop
-
-  - **Updation**:We can update this throgh the github
+- **Responsive Design**: Optimized for mobile, tablet, and desktop for a seamless shopping experience
+  
+- **Modern Stack**: Uses cutting-edge technologies for performance and scalability
+  
+- **Fast Updates**: Easily update and manage content via GitHub
+  
+- **Elegant UI**: Styled with shadcn/ui and Tailwind CSS for a clean and intuitive user interface  
 
   
 ##  ✏️ Edit a File Directly in GitHub
 
-- Navigate to the **desired file(s)** in your repository  
-- Click the **"Edit" button** (pencil icon) at the top right of the file view  
+- Navigate to the **desired file(s)** in your repository
+  
+- Click the **"Edit" button** (pencil icon) at the top right of the file view
+  
 - Make your changes and **commit** them directly from the browser  
 
    
@@ -49,13 +56,7 @@ This project is built with:
    - **Tailwind CSS** – Utility-first CSS framework
 
 
-## Project info
 
-**URL**: https://bsnlnetwork.vercel.app/
-
-## Mokup
-
-  ![Image](https://github.com/user-attachments/assets/7fd782d0-2abe-4855-9913-184667bcdc54)
 
 
 

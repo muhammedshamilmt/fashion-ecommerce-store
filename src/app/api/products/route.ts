@@ -15,10 +15,29 @@ const productSchema = z.object({
   images: z.array(z.string()).min(1, "At least one image is required"),
 });
 
-// Sample boys' thobas products
-const boysThobasProducts = [
+// Define MongoDB document type
+interface ProductDocument {
+  _id: ObjectId;
+  name: string;
+  description: string;
+  price: number;
+  images: string[];
+  category: string;
+  sizes: string[];
+  colors: string[];
+  inStock: boolean;
+  featured: boolean;
+  createdAt: string;
+  updatedAt: string;
+  stock: number;
+  sku: string;
+  material: string;
+  brand: string;
+}
+
+// Sample boys' thobas products without _id
+const boysThobasProducts: Omit<ProductDocument, '_id'>[] = [
   {
-    _id: new ObjectId().toString(),
     name: "Classic White Thoba",
     description: "Traditional white thoba with elegant embroidery, perfect for special occasions.",
     price: 2499,
@@ -39,7 +58,6 @@ const boysThobasProducts = [
     brand: "Al-Hayba"
   },
   {
-    _id: new ObjectId().toString(),
     name: "Embroidered Black Thoba",
     description: "Stylish black thoba with gold embroidery, ideal for formal events.",
     price: 2999,
@@ -60,7 +78,6 @@ const boysThobasProducts = [
     brand: "Al-Hayba"
   },
   {
-    _id: new ObjectId().toString(),
     name: "Casual Blue Thoba",
     description: "Comfortable blue thoba for daily wear, made with breathable fabric.",
     price: 1999,
@@ -81,7 +98,6 @@ const boysThobasProducts = [
     brand: "Al-Hayba"
   },
   {
-    _id: new ObjectId().toString(),
     name: "Premium Silk Thoba",
     description: "Luxurious silk thoba with intricate patterns, perfect for weddings.",
     price: 3999,
@@ -195,34 +211,80 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const category = searchParams.get('category');
+    const search = searchParams.get('search');
+    const sortField = searchParams.get('sortField') || 'createdAt';
+    const sortDirection = searchParams.get('sortDirection') || 'desc';
 
     const { db } = await connectToDatabase();
     
-    // Build query based on category
-    const query: any = {};
-    if (category === 'boys-thobas') {
-      query.category = 'Boys Thobas'; // Match the exact category name in the database
-    } else if (category) {
-      query.category = category;
+    // Try to get products from the database
+    let products = await db.collection<ProductDocument>("products").find().toArray();
+
+    // If no products in database, create and insert sample products
+    if (products.length === 0) {
+      const productsToInsert = boysThobasProducts.map(product => ({
+        ...product,
+        _id: new ObjectId()
+      }));
+      
+      try {
+        const result = await db.collection<ProductDocument>("products").insertMany(productsToInsert);
+        products = productsToInsert;
+        console.log("Sample products inserted into database");
+      } catch (error) {
+        console.error("Error inserting sample products:", error);
+      }
     }
 
-    const products = await db.collection("products")
-      .find(query)
-      .sort({ createdAt: -1 })
-      .toArray();
+    // Apply filters
+    if (category && category !== 'all') {
+      products = products.filter(product => product.category === category);
+    }
+
+    if (search) {
+      const searchLower = search.toLowerCase();
+      products = products.filter(product => 
+        product.name.toLowerCase().includes(searchLower) ||
+        product.description.toLowerCase().includes(searchLower) ||
+        product.category.toLowerCase().includes(searchLower) ||
+        (product.sku && product.sku.toLowerCase().includes(searchLower)) ||
+        (product.colors && product.colors.some((color: string) => color.toLowerCase().includes(searchLower))) ||
+        (product.sizes && product.sizes.some((size: string) => size.toLowerCase().includes(searchLower))) ||
+        (product.material && product.material.toLowerCase().includes(searchLower)) ||
+        (product.brand && product.brand.toLowerCase().includes(searchLower))
+      );
+    }
+
+    // Apply sorting
+    products.sort((a, b) => {
+      const aValue = a[sortField as keyof ProductDocument];
+      const bValue = b[sortField as keyof ProductDocument];
+      
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
+        return sortDirection === 'asc' 
+          ? aValue.localeCompare(bValue)
+          : bValue.localeCompare(aValue);
+      }
+      
+      return sortDirection === 'asc' 
+        ? (aValue > bValue ? 1 : -1)
+        : (bValue > aValue ? 1 : -1);
+    });
+
+    // Convert ObjectId to string for response
+    const serializedProducts = products.map(product => ({
+      ...product,
+      _id: product._id.toString()
+    }));
 
     return NextResponse.json({
       success: true,
-      data: products
+      data: serializedProducts
     });
   } catch (error) {
     console.error("Error fetching products:", error);
     return NextResponse.json(
-      { 
-        success: false, 
-        error: 'Failed to fetch products',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      },
+      { success: false, error: "Failed to fetch products" },
       { status: 500 }
     );
   }

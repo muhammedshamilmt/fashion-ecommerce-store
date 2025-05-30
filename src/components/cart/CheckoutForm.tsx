@@ -67,17 +67,29 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ subtotal }) => {
       let calculatedSubtotal;
       
       if (directPurchaseItem) {
-        // Direct purchase
-        orderItems = [{
-          productId: directPurchaseItem.product._id.toString(),
-          name: directPurchaseItem.product.name,
-          price: directPurchaseItem.product.price,
-          quantity: directPurchaseItem.quantity,
-          size: directPurchaseItem.size,
-          color: directPurchaseItem.color,
-          image: directPurchaseItem.product.images[0],
-        }];
-        calculatedSubtotal = directPurchaseItem.product.price * directPurchaseItem.quantity;
+        // Direct purchase - combine with cart items if they exist
+        orderItems = [
+          {
+            productId: directPurchaseItem.product._id.toString(),
+            name: directPurchaseItem.product.name,
+            price: directPurchaseItem.product.price,
+            quantity: directPurchaseItem.quantity,
+            size: directPurchaseItem.size,
+            color: directPurchaseItem.color,
+            image: directPurchaseItem.product.images[0],
+          },
+          ...items.map(item => ({
+            productId: item.product._id.toString(),
+            name: item.product.name,
+            price: item.product.price,
+            quantity: item.quantity,
+            size: item.size,
+            color: item.color,
+            image: item.product.images[0],
+          }))
+        ];
+        calculatedSubtotal = (directPurchaseItem.product.price * directPurchaseItem.quantity) + 
+          items.reduce((total, item) => total + (item.product.price * item.quantity), 0);
       } else {
         // Cart checkout
         // Validate cart items
@@ -197,13 +209,9 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ subtotal }) => {
       // Show success message
       toast.success("Order placed successfully!");
       
-      if (directPurchaseItem) {
-        // Clear direct purchase item
-        sessionStorage.removeItem('checkoutItem');
-      } else {
-        // Clear cart only for cart checkout
-        clearCart();
-      }
+      // Clear both direct purchase item and cart
+      sessionStorage.removeItem('checkoutItem');
+      clearCart();
 
       setPendingOrderData(null);
       setShowOrderNumber(false);

@@ -24,7 +24,7 @@ export default function BoysThobas() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch('/api/products?category=boys-thobas');
+        const response = await fetch('/api/products?category=Boys Thobas');
         const result = await response.json();
 
         if (!response.ok) {
@@ -89,26 +89,7 @@ export default function BoysThobas() {
             </p>
           </div>
 
-          {/* Search and Filter Bar */}
-          <div className="flex flex-col md:flex-row gap-4 mb-8">
-            <div className="flex-1">
-              <Input
-                type="search"
-                placeholder="Search thobas..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full"
-              />
-            </div>
-            <Button
-              variant="outline"
-              onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center gap-2"
-            >
-              <Filter size={20} />
-              Filters
-            </Button>
-          </div>
+         
 
           {/* Filters Panel */}
           {showFilters && (

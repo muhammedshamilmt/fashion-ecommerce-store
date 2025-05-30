@@ -143,7 +143,7 @@ const Footer = () => {
                   {isLoading ? 'Loading...' : contactInfo?.contactEmail || 'Email not available'}
                 </a>
               </li>
-              <li className="flex items-center space-x-2">
+              {/* <li className="flex items-center space-x-2">
                 <MessageCircle size={20} className="flex-shrink-0" />
                 <a
                   href={`https://wa.me/+91`} 
@@ -153,7 +153,7 @@ const Footer = () => {
                 >
                   {isLoading ? 'Loading...' : 'Chat on WhatsApp'}
                 </a>
-              </li>
+              </li> */}
             </ul>
           </div>
         </div>

@@ -6,6 +6,7 @@ import { ImageKitProvider } from "@/components/providers/ImageKitProvider";
 import { Suspense } from 'react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
+import WhatsAppButton from '@/components/common/WhatsAppButton';
 
 export const metadata: Metadata = {
   title: 'AL-HAYBA', // Your website title
@@ -24,7 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Providers>
               <Navbar/>
               <ClientLayout>{children}</ClientLayout>
-             
+              <WhatsAppButton />
             </Providers>
           </ImageKitProvider>
         </Suspense>

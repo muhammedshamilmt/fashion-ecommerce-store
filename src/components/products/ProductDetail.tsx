@@ -95,6 +95,9 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
       return;
     }
 
+    // First add the item to cart
+    addItem(product, quantity, selectedSize, selectedColor);
+
     // Store the product details in sessionStorage for checkout
     const checkoutItem = {
       product,
@@ -206,13 +209,13 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
           </button>
           
           {/* Try-on Button */}
-          <button
+          {/* <button
             onClick={handleTryOn}
             className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-sm px-6 py-3 rounded-full flex items-center gap-2 shadow-md hover:bg-indigo-600 hover:text-white transition-all duration-300"
           >
             <Scan size={18} />
             <span className="font-medium">Virtual Try-On</span>
-          </button>
+          </button> */}
         </div>
         
         {/* Thumbnail Images */}

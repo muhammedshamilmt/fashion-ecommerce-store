@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { ShoppingBag, User, Menu, X, Search } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -61,7 +62,16 @@ const Navbar: React.FC = () => {
       <div className="container mx-auto px-4 z-10 md:px-8">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center">
+          <Link href="/" className="flex items-center space-x-2">
+            <div className="rounded-full overflow-hidden bg-white p-1 shadow-sm">
+              <Image
+                src="/logo.png"
+                alt="AL-HAYBA Logo"
+                width={40}
+                height={40}
+                className="object-contain"
+              />
+            </div>
             <span className="text-2xl font-['Adelone-Serial-Extrabold-Regular'] text-fashion-primary tracking-tight">
               AL-HAYBA
             </span>

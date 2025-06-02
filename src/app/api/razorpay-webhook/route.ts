@@ -5,7 +5,8 @@ import { headers } from 'next/headers';
 export async function POST(request: Request) {
   try {
     const body = await request.text();
-    const signature = headers().get('x-razorpay-signature');
+    const headersList = await headers();
+    const signature = headersList.get('x-razorpay-signature');
 
     if (!signature) {
       return NextResponse.json(

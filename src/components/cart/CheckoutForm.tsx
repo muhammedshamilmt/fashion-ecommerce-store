@@ -26,6 +26,12 @@ interface CheckoutFormProps {
   subtotal: number;
 }
 
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
+
 const CheckoutForm: React.FC<CheckoutFormProps> = ({ subtotal }) => {
   const { items, clearCart } = useCart();
   const router = useRouter();
@@ -56,6 +62,86 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ subtotal }) => {
     const timestamp = Date.now().toString();
     const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
     return `ORD-${timestamp.slice(-6)}-${random}`;
+  };
+
+  const initializeRazorpay = () => {
+    return new Promise((resolve) => {
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
+  const handleRazorpayPayment = async (orderData: any) => {
+    try {
+      const res = await initializeRazorpay();
+      if (!res) {
+        toast.error('Razorpay SDK failed to load');
+        return;
+      }
+
+      // Create order on server
+      const response = await fetch('/api/create-razorpay-order', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          amount: orderData.total,
+        }),
+      });
+
+      const data = await response.json();
+      if (!data.success) {
+        throw new Error('Failed to create Razorpay order');
+      }
+
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        amount: data.order.amount,
+        currency: data.order.currency,
+        name: 'Fashion Store',
+        description: 'Payment for your order',
+        order_id: data.order.id,
+        handler: async function (response: any) {
+          try {
+            // Update order data with payment details
+            const updatedOrderData = {
+              ...orderData,
+              paymentDetails: {
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_signature: response.razorpay_signature,
+              },
+            };
+
+            // Store the order data and show overlay
+            setPendingOrderData(updatedOrderData);
+            setOrderNumber(generateOrderNumber());
+            setShowOrderNumber(true);
+          } catch (error) {
+            toast.error('Payment verification failed');
+            console.error('Payment verification error:', error);
+          }
+        },
+        prefill: {
+          name: `${orderData.customerInfo.firstName} ${orderData.customerInfo.lastName}`,
+          email: orderData.customerInfo.email,
+          contact: orderData.customerInfo.phone,
+        },
+        theme: {
+          color: '#6366f1',
+        },
+      };
+
+      const paymentObject = new window.Razorpay(options);
+      paymentObject.open();
+    } catch (error) {
+      toast.error('Payment initialization failed');
+      console.error('Payment initialization error:', error);
+    }
   };
 
   const onSubmit = async (data: any) => {
@@ -163,10 +249,14 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ subtotal }) => {
         ]
       };
 
-      // Store the order data and show overlay
-      setPendingOrderData(orderData);
-      setOrderNumber(generatedOrderNumber);
-      setShowOrderNumber(true);
+      if (paymentMethod === 'online_payment') {
+        await handleRazorpayPayment(orderData);
+      } else {
+        // For cash on delivery
+        setPendingOrderData(orderData);
+        setOrderNumber(generateOrderNumber());
+        setShowOrderNumber(true);
+      }
       
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to process order");

@@ -39,7 +39,7 @@ const Hero = () => {
             Elevate Your Fashion Experience
           </h1>
           <p className="text-lg text-muted-foreground max-w-xl mx-auto lg:mx-0 mb-8 animate-fade-in">
-            Say goodbye to returns. Our AI-powered 3D body scanning ensures your clothes fit perfectly before you buy.
+            
           </p>
           <div className="flex flex-wrap gap-4 animate-fade-in">
             <div className="flex flex-col-2 sm:flex-row gap-4 justify-center lg:justify-start">

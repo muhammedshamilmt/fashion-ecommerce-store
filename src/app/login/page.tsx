@@ -38,13 +38,17 @@ const Login = () => {
         localStorage.setItem("adminSession", "true");
         
         toast.success("Welcome back, Admin!");
-        router.replace("/admin");
+        
+        // Add 2 second delay before redirecting
+        setTimeout(() => {
+          router.replace("/admin");
+        }, 2000);
       } else {
         toast.error("Invalid email or password");
+        setIsLoading(false);
       }
     } catch (error) {
       toast.error("An error occurred during login");
-    } finally {
       setIsLoading(false);
     }
   };

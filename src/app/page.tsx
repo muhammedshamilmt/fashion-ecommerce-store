@@ -208,14 +208,14 @@ const Index = () => {
                   ))}
                 </div>
                 <p className="mb-4 text-white/90">
-                  "The 3D scanning technology is a game-changer! I've never had clothes fit so perfectly. No more returns for me."
+                  "The quality of the Thobe is outstanding! The fabric feels premium and the stitching is perfect. I’ve worn it to several occasions and always receive compliments."
                 </p>
                 <div className="flex items-center">
                   <div className="w-10 h-10 rounded-full overflow-hidden mr-3">
-                    <img src="https://randomuser.me/api/portraits/women/45.jpg" alt="Customer" className="w-full h-full object-cover" />
+                    {/* <img src="https://randomuser.me/api/portraits/women/45.jpg" alt="Customer" className="w-full h-full object-cover" /> */}
                   </div>
                   <div>
-                    <p className="font-medium">Sarah Johnson</p>
+                    <p className="font-medium"> Ahmed R. </p>
                     <p className="text-white/70 text-sm">Loyal Customer</p>
                   </div>
                 </div>
@@ -231,14 +231,14 @@ const Index = () => {
                   ))}
                 </div>
                 <p className="mb-4 text-white/90">
-                  "Virtual try-on is so convenient! I can shop from anywhere and know exactly how outfits will look on me. Brilliant!"
+                  "This Thobe is both traditional and stylish. It fits perfectly and is very comfortable for daily wear. Definitely ordering more!"
                 </p>
                 <div className="flex items-center">
                   <div className="w-10 h-10 rounded-full overflow-hidden mr-3">
-                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Customer" className="w-full h-full object-cover" />
+                    {/* <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Customer" className="w-full h-full object-cover" /> */}
                   </div>
                   <div>
-                    <p className="font-medium">David Chen</p>
+                    <p className="font-medium">Yusuf Khan </p>
                     <p className="text-white/70 text-sm">Fashion Enthusiast</p>
                   </div>
                 </div>
@@ -254,14 +254,14 @@ const Index = () => {
                   ))}
                 </div>
                 <p className="mb-4 text-white/90">
-                  "The AI recommendations are spot on! FashionFit has completely transformed how I discover new styles that suit my body."
+                  "I was impressed by the fast delivery and elegant packaging. The Thobe exceeded my expectations – classy, breathable, and well-crafted"
                 </p>
                 <div className="flex items-center">
                   <div className="w-10 h-10 rounded-full overflow-hidden mr-3">
-                    <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Customer" className="w-full h-full object-cover" />
+                    {/* <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Customer" className="w-full h-full object-cover" /> */}
                   </div>
                   <div>
-                    <p className="font-medium">Emily Rodriguez</p>
+                    <p className="font-medium">Omar Latif</p>
                     <p className="text-white/70 text-sm">Style Conscious</p>
                   </div>
                 </div>

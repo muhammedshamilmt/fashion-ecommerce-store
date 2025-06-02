@@ -1,13 +1,13 @@
 'use client'
 import React, { useState, useEffect } from "react";
-import { 
-  ShoppingBag, 
-  Heart, 
-  Share2, 
-  ArrowLeft, 
+import {
+  ShoppingBag,
+  Heart,
+  Share2,
+  ArrowLeft,
   ArrowRight,
-  Truck, 
-  RotateCcw, 
+  Truck,
+  RotateCcw,
   Shield,
   Scan,
   PanelRight,
@@ -74,7 +74,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
 
   const handleAddToCart = () => {
     if (!product) return;
-    
+
     // Check if size and color are selected
     if (!selectedSize || !selectedColor) {
       toast.error("Please select size and color");
@@ -106,7 +106,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
       color: selectedColor
     };
     sessionStorage.setItem('checkoutItem', JSON.stringify(checkoutItem));
-    
+
     // Redirect to checkout
     router.push('/checkout?direct=true');
   };
@@ -130,14 +130,14 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
 
   const handlePrevImage = () => {
     if (!product) return;
-    setCurrentImageIndex((prev) => 
+    setCurrentImageIndex((prev) =>
       prev === 0 ? product.images.length - 1 : prev - 1
     );
   };
 
   const handleNextImage = () => {
     if (!product) return;
-    setCurrentImageIndex((prev) => 
+    setCurrentImageIndex((prev) =>
       (prev + 1) % product.images.length
     );
   };
@@ -190,7 +190,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
             alt={product.name}
             className="w-full h-full object-cover"
           />
-          
+
           {/* Navigation Arrows */}
           <button
             onClick={handlePrevImage}
@@ -199,7 +199,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
           >
             <ArrowLeft size={20} />
           </button>
-          
+
           <button
             onClick={handleNextImage}
             className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center shadow-md hover:bg-indigo-600 hover:text-white transition-all duration-300"
@@ -207,7 +207,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
           >
             <ArrowRight size={20} />
           </button>
-          
+
           {/* Try-on Button */}
           {/* <button
             onClick={handleTryOn}
@@ -217,18 +217,17 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
             <span className="font-medium">Virtual Try-On</span>
           </button> */}
         </div>
-        
+
         {/* Thumbnail Images */}
         <div className="flex space-x-4 overflow-x-auto pb-2">
           {product.images.map((image, index) => (
             <button
               key={index}
               onClick={() => setCurrentImageIndex(index)}
-              className={`w-20 h-20 flex-shrink-0 rounded-md overflow-hidden border-2 transition-all duration-200 ${
-                currentImageIndex === index
+              className={`w-20 h-20 flex-shrink-0 rounded-md overflow-hidden border-2 transition-all duration-200 ${currentImageIndex === index
                   ? "border-indigo-600"
                   : "border-transparent"
-              }`}
+                }`}
             >
               <img
                 src={image}
@@ -251,19 +250,19 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
           </h1>
           <div className="flex items-center space-x-4 mb-6">
             <p className="text-2xl font-bold text-gray-900">
-              ${product.price.toFixed(2)}
+              ₹{product.price.toFixed(2)}
             </p>
             <div className="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full">
               In Stock
             </div>
           </div>
-          
+
           {/* Product Rating Display */}
           <div className="flex items-center mb-6">
             <Rating readOnly initialValue={4.5} className="mr-2" />
             <span className="text-gray-500 text-sm">(128 reviews)</span>
           </div>
-          
+
           <p className="text-gray-600 mb-8">
             {product.description}
           </p>
@@ -282,11 +281,10 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
               <button
                 key={size}
                 onClick={() => setSelectedSize(size)}
-                className={`h-10 min-w-[40px] px-3 rounded-md border transition-all duration-200 ${
-                  selectedSize === size
+                className={`h-10 min-w-[40px] px-3 rounded-md border transition-all duration-200 ${selectedSize === size
                     ? "border-indigo-600 bg-indigo-600 text-white"
                     : "border-gray-300 hover:border-indigo-600"
-                }`}
+                  }`}
               >
                 {size}
               </button>
@@ -302,11 +300,10 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
               <button
                 key={color}
                 onClick={() => setSelectedColor(color)}
-                className={`relative w-10 h-10 rounded-full border-2 transition-all duration-200 ${
-                  selectedColor === color
+                className={`relative w-10 h-10 rounded-full border-2 transition-all duration-200 ${selectedColor === color
                     ? "border-indigo-600"
                     : "border-transparent"
-                }`}
+                  }`}
               >
                 <span
                   className="block w-full h-full rounded-full"
@@ -346,56 +343,56 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
 
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-4">
-          <Button 
-            onClick={handleAddToCart} 
+          <Button
+            onClick={handleAddToCart}
             className="bg-indigo-600 hover:bg-indigo-700 flex-1 flex items-center justify-center gap-2"
           >
             <ShoppingBag size={18} />
             Add to Cart
           </Button>
-          
-          <Button 
-            onClick={handleBuyNow} 
+
+          <Button
+            onClick={handleBuyNow}
             className="bg-purple-600 hover:bg-purple-700 flex-1 flex items-center justify-center gap-2"
           >
             <Zap size={18} />
             Buy Now
           </Button>
-          
-          
+
+
         </div>
 
         {/* Product Info Tabs */}
         <div className="mt-8 pt-8 border-t border-gray-200">
           <Tabs defaultValue="details" className="w-full">
             <TabsList className="mb-6 bg-gray-100 w-full grid grid-cols-3">
-              <TabsTrigger 
-                value="details" 
+              <TabsTrigger
+                value="details"
                 className="data-[state=active]:bg-white data-[state=active]:shadow-sm"
                 onClick={() => setActiveTab("details")}
               >
                 Details
               </TabsTrigger>
-              <TabsTrigger 
-                value="shipping" 
+              <TabsTrigger
+                value="shipping"
                 className="data-[state=active]:bg-white data-[state=active]:shadow-sm"
                 onClick={() => setActiveTab("shipping")}
               >
                 Shipping
               </TabsTrigger>
-              <TabsTrigger 
-                value="reviews" 
+              <TabsTrigger
+                value="reviews"
                 className="data-[state=active]:bg-white data-[state=active]:shadow-sm"
                 onClick={() => setActiveTab("reviews")}
               >
                 Reviews
               </TabsTrigger>
             </TabsList>
-            
+
             <TabsContent value="details" className="space-y-4">
               <div className="space-y-4">
-                
-                
+
+
                 <div className="flex items-start gap-3">
                   <Award className="w-5 h-5 mt-0.5 text-indigo-600" />
                   <div>
@@ -405,7 +402,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
                     </p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-start gap-3">
                   <Clock className="w-5 h-5 mt-0.5 text-indigo-600" />
                   <div>
@@ -417,7 +414,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
                 </div>
               </div>
             </TabsContent>
-            
+
             <TabsContent value="shipping" className="space-y-4">
               <div className="space-y-4">
                 <div className="flex items-start gap-3">
@@ -429,7 +426,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
                     </p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-start gap-3">
                   <RotateCcw className="w-5 h-5 mt-0.5 text-indigo-600" />
                   <div>
@@ -439,7 +436,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
                     </p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-start gap-3">
                   <Shield className="w-5 h-5 mt-0.5 text-indigo-600" />
                   <div>
@@ -451,7 +448,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
                 </div>
               </div>
             </TabsContent>
-            
+
             <TabsContent value="reviews" className="space-y-6">
               <div className="flex justify-between items-center">
                 <div>
@@ -461,14 +458,14 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ productId }) => {
                   </div>
                   <p className="text-sm text-gray-600">Based on 128 reviews</p>
                 </div>
-                <Button 
+                <Button
                   onClick={handleWriteReview}
                   className="bg-indigo-600 hover:bg-indigo-700 text-white"
                 >
                   Write a Review
                 </Button>
               </div>
-              
+
               <div className="border-t border-gray-200 pt-6">
                 <p className="text-center text-gray-500">Reviews will appear here</p>
               </div>

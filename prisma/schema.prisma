@@ -28,3 +28,23 @@ model Product {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
+
+model Order {
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  orderNumber     String    @unique
+  customerInfo    Json
+  items           Json
+  subtotal        Float
+  shipping        Float
+  tax             Float
+  total           Float
+  paymentMethod   String
+  paymentStatus   String    @default("pending") // pending, authorized, captured, failed
+  status          String    @default("pending") // pending, processing, shipped, delivered
+  currentLocation String
+  estimatedDelivery String
+  trackingHistory Json[]
+  paymentDetails  Json?     // Store payment gateway details
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}

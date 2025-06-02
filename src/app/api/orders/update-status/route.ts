@@ -4,17 +4,26 @@ import { ObjectId } from 'mongodb';
 
 export async function POST(request: Request) {
   try {
-    const { orderId, status, paymentId, errorCode, errorDescription } = await request.json();
+    const { orderId, status, paymentStatus, paymentId, errorCode, errorDescription } = await request.json();
 
     const { db } = await connectToDatabase();
 
     const updateData: any = {
-      status,
       updatedAt: new Date(),
     };
 
+    if (status) {
+      updateData.status = status;
+    }
+
+    if (paymentStatus) {
+      updateData.paymentStatus = paymentStatus;
+    }
+
     if (paymentId) {
-      updateData.paymentId = paymentId;
+      updateData.paymentDetails = {
+        razorpay_payment_id: paymentId,
+      };
     }
 
     if (errorCode) {
@@ -27,9 +36,9 @@ export async function POST(request: Request) {
     // Add to tracking history
     updateData.$push = {
       trackingHistory: {
-        status,
+        status: paymentStatus || status,
         timestamp: new Date().toISOString(),
-        details: errorDescription || 'Payment status updated',
+        details: errorDescription || 'Status updated',
       },
     };
 

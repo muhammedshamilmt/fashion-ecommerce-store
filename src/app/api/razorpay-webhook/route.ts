@@ -71,7 +71,7 @@ async function handlePaymentAuthorized(payment: any) {
       },
       body: JSON.stringify({
         orderId: payment.order_id,
-        status: 'payment_authorized',
+        paymentStatus: 'authorized',
         paymentId: payment.id,
       }),
     });
@@ -90,7 +90,8 @@ async function handlePaymentCaptured(payment: any) {
       },
       body: JSON.stringify({
         orderId: payment.order_id,
-        status: 'payment_captured',
+        paymentStatus: 'captured',
+        status: 'processing',
         paymentId: payment.id,
       }),
     });
@@ -109,7 +110,7 @@ async function handlePaymentFailed(payment: any) {
       },
       body: JSON.stringify({
         orderId: payment.order_id,
-        status: 'payment_failed',
+        paymentStatus: 'failed',
         paymentId: payment.id,
         errorCode: payment.error_code,
         errorDescription: payment.error_description,

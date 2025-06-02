@@ -38,6 +38,7 @@ const orderSchema = z.object({
   tax: z.number(),
   total: z.number(),
   paymentMethod: z.string(),
+  paymentStatus: z.enum(["pending", "authorized", "captured", "failed"]).default("pending"),
   status: z.enum(["pending", "processing", "shipped", "delivered"]).default("pending"),
   currentLocation: z.string(),
   estimatedDelivery: z.string(),
@@ -45,7 +46,12 @@ const orderSchema = z.object({
     status: z.string(),
     location: z.string(),
     timestamp: z.string()
-  }))
+  })),
+  paymentDetails: z.object({
+    razorpay_payment_id: z.string().optional(),
+    razorpay_order_id: z.string().optional(),
+    razorpay_signature: z.string().optional(),
+  }).optional()
 });
 
 export async function GET(request: Request) {

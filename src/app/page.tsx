@@ -211,9 +211,9 @@ const Index = () => {
                   "The quality of the Thobe is outstanding! The fabric feels premium and the stitching is perfect. I’ve worn it to several occasions and always receive compliments."
                 </p>
                 <div className="flex items-center">
-                  <div className="w-10 h-10 rounded-full overflow-hidden mr-3">
-                    {/* <img src="https://randomuser.me/api/portraits/women/45.jpg" alt="Customer" className="w-full h-full object-cover" /> */}
-                  </div>
+                  {/* <div className="w-10 h-10 rounded-full overflow-hidden mr-3">
+                    <img src="https://randomuser.me/api/portraits/women/45.jpg" alt="Customer" className="w-full h-full object-cover" />
+                  </div> */}
                   <div>
                     <p className="font-medium"> Ahmed R. </p>
                     <p className="text-white/70 text-sm">Loyal Customer</p>
@@ -234,9 +234,9 @@ const Index = () => {
                   "This Thobe is both traditional and stylish. It fits perfectly and is very comfortable for daily wear. Definitely ordering more!"
                 </p>
                 <div className="flex items-center">
-                  <div className="w-10 h-10 rounded-full overflow-hidden mr-3">
-                    {/* <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Customer" className="w-full h-full object-cover" /> */}
-                  </div>
+                  {/* <div className="w-10 h-10 rounded-full overflow-hidden mr-3">
+                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Customer" className="w-full h-full object-cover" />
+                  </div> */}
                   <div>
                     <p className="font-medium">Yusuf Khan </p>
                     <p className="text-white/70 text-sm">Fashion Enthusiast</p>
@@ -257,9 +257,9 @@ const Index = () => {
                   "I was impressed by the fast delivery and elegant packaging. The Thobe exceeded my expectations – classy, breathable, and well-crafted"
                 </p>
                 <div className="flex items-center">
-                  <div className="w-10 h-10 rounded-full overflow-hidden mr-3">
-                    {/* <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Customer" className="w-full h-full object-cover" /> */}
-                  </div>
+                    {/* <div className="w-10 h-10 rounded-full overflow-hidden mr-3">
+                      <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Customer" className="w-full h-full object-cover" />
+                    </div> */}
                   <div>
                     <p className="font-medium">Omar Latif</p>
                     <p className="text-white/70 text-sm">Style Conscious</p>

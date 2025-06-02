@@ -63,7 +63,7 @@ const Navbar: React.FC = () => {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
-            <div className="rounded-full overflow-hidden b p-1 shadow-sm">
+            <div className="rounded-full overflow-hidden  shadow-sm">
               <Image
                 src="/logo.png"
                 alt="AL-HAYBA Logo"

@@ -37,20 +37,49 @@ export async function GET(
       );
     }
 
-    // Format the response
+    // Format the response with more detailed information
     const trackingInfo = {
       orderId: order._id.toString(),
       orderNumber: order.orderNumber,
-      status: order.status || 'Processing',
+      status: order.status || 'pending',
       estimatedDelivery: order.estimatedDelivery || 'Not available',
       currentLocation: order.currentLocation || 'Processing at warehouse',
-      history: order.trackingHistory || [
+      customerInfo: {
+        name: `${order.customerInfo.firstName} ${order.customerInfo.lastName}`,
+        email: order.customerInfo.email,
+        phone: order.customerInfo.phone,
+        address: order.customerInfo.address,
+        city: order.customerInfo.city,
+        state: order.customerInfo.state,
+        zipCode: order.customerInfo.zipCode,
+        country: order.customerInfo.country
+      },
+      items: order.items.map((item: any) => ({
+        name: item.name,
+        price: item.price,
+        quantity: item.quantity,
+        size: item.size,
+        color: item.color,
+        image: item.image
+      })),
+      paymentInfo: {
+        method: order.paymentMethod,
+        status: order.paymentStatus,
+        total: order.total,
+        subtotal: order.subtotal,
+        shipping: order.shipping,
+        tax: order.tax
+      },
+      trackingHistory: order.trackingHistory || [
         {
           status: 'Order Placed',
           timestamp: order.createdAt || new Date().toISOString(),
-          location: 'Online Store'
+          location: 'Online Store',
+          details: 'Your order has been placed successfully'
         }
-      ]
+      ],
+      createdAt: order.createdAt,
+      updatedAt: order.updatedAt
     };
 
     return NextResponse.json({

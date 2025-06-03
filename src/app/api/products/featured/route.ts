@@ -7,22 +7,12 @@ export async function GET() {
   try {
     const { db } = await connectToDatabase();
     
-    // First try to fetch featured products
-    let featuredProducts = await db
+    // Only fetch featured products
+    const featuredProducts = await db
       .collection("products")
       .find({ featured: true })
       .limit(8)
       .toArray();
-
-    // If no featured products found, fetch latest products as fallback
-    if (!featuredProducts || featuredProducts.length === 0) {
-      featuredProducts = await db
-        .collection("products")
-        .find()
-        .sort({ createdAt: -1 })
-        .limit(8)
-        .toArray();
-    }
 
     // Format the products to ensure all required fields are present
     const formattedProducts = featuredProducts.map(product => ({
@@ -40,7 +30,7 @@ export async function GET() {
 
     return NextResponse.json(
       { 
-      success: true,
+        success: true,
         data: formattedProducts 
       },
       { 

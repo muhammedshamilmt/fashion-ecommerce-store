@@ -82,7 +82,7 @@ export default function BoysThobas() {
         <div className="container mx-auto px-4">
           {/* Header */}
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-[#2B3972] mb-4">Boys' Thobas</h1>
+            <h1 className="text-4xl font-bold text-[#2B3972] mb-4">Boy's Thobas</h1>
             <p className="text-gray-600 max-w-2xl mx-auto">
               Discover our collection of elegant and comfortable thobas for boys. 
               Perfect for special occasions and daily wear.

@@ -102,7 +102,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ subtotal }) => {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: data.order.amount,
         currency: data.order.currency,
-        name: 'Fashion Store',
+        name: 'ALHYBA',
         description: 'Payment for your order',
         order_id: data.order.id,
         handler: async function (response: any) {

@@ -128,6 +128,26 @@ exports.Prisma.ProductScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.OrderScalarFieldEnum = {
+  id: 'id',
+  orderNumber: 'orderNumber',
+  customerInfo: 'customerInfo',
+  items: 'items',
+  subtotal: 'subtotal',
+  shipping: 'shipping',
+  tax: 'tax',
+  total: 'total',
+  paymentMethod: 'paymentMethod',
+  paymentStatus: 'paymentStatus',
+  status: 'status',
+  currentLocation: 'currentLocation',
+  estimatedDelivery: 'estimatedDelivery',
+  trackingHistory: 'trackingHistory',
+  paymentDetails: 'paymentDetails',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -140,7 +160,8 @@ exports.Prisma.QueryMode = {
 
 
 exports.Prisma.ModelName = {
-  Product: 'Product'
+  Product: 'Product',
+  Order: 'Order'
 };
 
 /**
